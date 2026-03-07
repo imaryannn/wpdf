@@ -4,26 +4,42 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WPDF - WebWora PDF Tools</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double+Ink:wght@100..900&family=Bitcount+Prop+Double:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="modern-styles.css">
 </head>
 <body>
     <nav class="navbar">
         <div class="navbar-brand">
             <div class="logo-container">
                 <div class="logo-icon">
-                    <i class="fas fa-file-pdf"></i>
+                   
                 </div>
                 <span class="logo-text">WPDF</span>
             </div>
         </div>
-        <div class="navbar-links">
+        <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+            <span></span>
+            <span></span>
+        </button>
+        <div class="navbar-links" id="navbar-links">
             <div class="navbar-feature active">PDF Merger</div>
             <div class="navbar-feature">PDF Splitter</div>
             <div class="navbar-feature">PDF Compressor</div>
             <div class="navbar-feature">Images to PDF</div>
             <div class="navbar-feature">PDF to Images</div>
+            <div class="theme-switch-wrapper">
+                <span class="theme-switch-icon"><i class="fas fa-sun"></i></span>
+                <label class="theme-switch" for="theme-checkbox">
+                    <input type="checkbox" id="theme-checkbox" aria-label="Switch between dark and light mode" />
+                    <div class="slider round"></div>
+                </label>
+                <span class="theme-switch-icon"><i class="fas fa-moon"></i></span>
+            </div>
         </div>
         <div class="theme-switch-wrapper">
             <span class="theme-switch-icon"><i class="fas fa-sun"></i></span>
@@ -461,8 +477,8 @@
     
     <footer>
         <div class="container">
-            <p>Made with ❤️ by WebWora in India</p>
-            <p>&copy; 2025 WPDF - WebWora PDF Tools. All rights reserved.</p>
+            <p>Made with ❤️ by Aryan</p>
+           
         </div>
     </footer>
     

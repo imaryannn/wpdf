@@ -1166,3 +1166,39 @@ function initializeNavigation() {
         }
     }
 } 
+
+
+// Hamburger menu functionality
+function initializeHamburger() {
+    const hamburger = document.getElementById('hamburger');
+    const navbarLinks = document.getElementById('navbar-links');
+    
+    if (hamburger && navbarLinks) {
+        hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('active');
+            navbarLinks.classList.toggle('active');
+        });
+        
+        // Close menu when clicking on a nav item
+        const navFeatures = navbarLinks.querySelectorAll('.navbar-feature');
+        navFeatures.forEach(feature => {
+            feature.addEventListener('click', () => {
+                hamburger.classList.remove('active');
+                navbarLinks.classList.remove('active');
+            });
+        });
+        
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!hamburger.contains(e.target) && !navbarLinks.contains(e.target)) {
+                hamburger.classList.remove('active');
+                navbarLinks.classList.remove('active');
+            }
+        });
+    }
+}
+
+// Add to initialization
+document.addEventListener('DOMContentLoaded', () => {
+    initializeHamburger();
+});
