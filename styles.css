@@ -409,16 +409,26 @@ select:focus {
     border-radius: var(--radius);
     padding: 3rem;
     text-align: center;
-    cursor: pointer;
+    cursor: pointer !important;
     background: var(--background);
     transition: all 0.3s;
+    position: relative;
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    z-index: 1;
 }
 
 .drop-zone:hover {
     border-color: var(--primary-color);
     background: var(--surface);
+    transform: scale(1.01);
 }
 
+.drop-zone.drop-zone-active,
 .drop-zone.active {
     border-color: var(--primary-color);
     background: linear-gradient(135deg, rgba(139, 111, 71, 0.05), rgba(166, 138, 100, 0.05));
@@ -634,30 +644,227 @@ select.form-control {
     width: 100%;
     height: 8px;
     border-radius: 4px;
-    background: var(--light-gray);
+    background: linear-gradient(to right, #e8dfd6 0%, var(--primary-color) 80%);
     outline: none;
     -webkit-appearance: none;
     appearance: none;
     margin: 10px 0;
+    cursor: pointer !important;
+    pointer-events: auto !important;
+    z-index: 10 !important;
+    border: 2px solid var(--border);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.quality-slider::-webkit-slider-track {
+    width: 100%;
+    height: 8px;
+    cursor: pointer;
+    background: linear-gradient(to right, #e8dfd6 0%, var(--primary-color) 80%);
+    border-radius: 4px;
+    border: none;
 }
 
 .quality-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
     border-radius: 50%;
-    background: var(--primary-color);
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
     cursor: pointer;
+    border: 3px solid white;
+    box-shadow: 0 2px 6px rgba(139, 111, 71, 0.3), 0 1px 3px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s ease;
+}
+
+.quality-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(139, 111, 71, 0.4), 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.quality-slider::-moz-range-track {
+    width: 100%;
+    height: 8px;
+    cursor: pointer;
+    background: linear-gradient(to right, #e8dfd6 0%, var(--primary-color) 80%);
+    border-radius: 4px;
+    border: 2px solid var(--border);
 }
 
 .quality-slider::-moz-range-thumb {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+    cursor: pointer;
+    border: 3px solid white;
+    box-shadow: 0 2px 6px rgba(139, 111, 71, 0.3), 0 1px 3px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s ease;
+}
+
+.quality-slider::-moz-range-thumb:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(139, 111, 71, 0.4), 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* Dark theme quality slider */
+[data-theme="dark"] .quality-slider {
+    background: linear-gradient(to right, #3e342d 0%, var(--primary-color) 80%);
+    border-color: rgba(166, 138, 100, 0.3);
+}
+
+[data-theme="dark"] .quality-slider::-webkit-slider-track {
+    background: linear-gradient(to right, #3e342d 0%, var(--primary-color) 80%);
+}
+
+[data-theme="dark"] .quality-slider::-moz-range-track {
+    background: linear-gradient(to right, #3e342d 0%, var(--primary-color) 80%);
+    border-color: rgba(166, 138, 100, 0.3);
+}
+
+/* PDF Page Selection Styles */
+.page-selection-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.btn-sm {
+    padding: 0.5rem 1rem;
+    font-size: 14px;
+}
+
+.selected-count {
+    font-weight: 600;
+    color: var(--primary-color);
+    background: rgba(139, 111, 71, 0.1);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    border: 1px solid rgba(139, 111, 71, 0.2);
+}
+
+.pdf-pages-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 1rem;
+    padding: 1rem;
+    border: 2px dashed var(--border);
+    border-radius: var(--radius);
+    background: var(--background);
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.pdf-page-item {
+    position: relative;
+    border: 3px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--surface);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    aspect-ratio: 3/4;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.pdf-page-item:hover {
+    border-color: var(--primary-color);
+    box-shadow: var(--shadow-md);
+    transform: scale(1.02);
+}
+
+.pdf-page-item.selected {
+    border-color: var(--primary-color);
+    background: linear-gradient(135deg, rgba(139, 111, 71, 0.1), rgba(166, 138, 100, 0.1));
+    box-shadow: 0 4px 12px rgba(139, 111, 71, 0.2);
+}
+
+.pdf-page-item canvas {
+    width: 100%;
+    height: auto;
+    max-height: 80%;
+    object-fit: contain;
+}
+
+.pdf-page-item .page-number {
+    position: absolute;
+    bottom: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(139, 111, 71, 0.9);
+    color: white;
+    border-radius: 12px;
+    padding: 2px 8px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.pdf-page-item .selection-indicator {
+    position: absolute;
+    top: 5px;
+    right: 5px;
     width: 20px;
     height: 20px;
     border-radius: 50%;
     background: var(--primary-color);
-    cursor: pointer;
-    border: none;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.pdf-page-item.selected .selection-indicator {
+    opacity: 1;
+}
+
+.pdf-page-loading {
+    color: var(--text-secondary);
+    font-size: 12px;
+    text-align: center;
+}
+
+/* Dark theme styles for PDF page selection */
+[data-theme="dark"] .selected-count {
+    color: #c4a57b;
+    background: rgba(166, 138, 100, 0.15);
+    border-color: rgba(166, 138, 100, 0.3);
+}
+
+[data-theme="dark"] .pdf-pages-grid {
+    border-color: rgba(166, 138, 100, 0.3);
+    background: rgba(45, 37, 32, 0.5);
+}
+
+[data-theme="dark"] .pdf-page-item {
+    border-color: rgba(166, 138, 100, 0.3);
+    background: rgba(45, 37, 32, 0.8);
+}
+
+[data-theme="dark"] .pdf-page-item:hover {
+    border-color: #a68a64;
+}
+
+[data-theme="dark"] .pdf-page-item.selected {
+    border-color: #a68a64;
+    background: linear-gradient(135deg, rgba(166, 138, 100, 0.15), rgba(196, 165, 123, 0.15));
+    box-shadow: 0 4px 12px rgba(166, 138, 100, 0.3);
+}
+
+[data-theme="dark"] .pdf-page-item .page-number {
+    background: rgba(166, 138, 100, 0.9);
+}
+
+[data-theme="dark"] .pdf-page-item .selection-indicator {
+    background: #a68a64;
 }
 
 .quality-label {
@@ -674,7 +881,112 @@ select.form-control {
     display: block;
 }
 
-/* Adjust theme switch for smaller screens */
+/* Image Preview Styles */
+.image-preview-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1rem;
+    padding: 1rem;
+    border: 2px dashed var(--border);
+    border-radius: var(--radius);
+    background: var(--background);
+    min-height: 200px;
+}
+
+.image-preview-item {
+    position: relative;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--surface);
+    cursor: move;
+    transition: all 0.3s ease;
+    aspect-ratio: 3/4;
+}
+
+.image-preview-item:hover {
+    border-color: var(--primary-color);
+    box-shadow: var(--shadow-md);
+    transform: scale(1.02);
+}
+
+.image-preview-item.sortable-ghost {
+    opacity: 0.5;
+    transform: scale(0.95);
+}
+
+.image-preview-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.image-preview-item .image-info {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+    color: white;
+    padding: 0.5rem;
+    font-size: 12px;
+    text-align: center;
+}
+
+.image-preview-item .remove-image {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: rgba(255, 0, 0, 0.8);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    transition: all 0.2s ease;
+}
+
+.image-preview-item .remove-image:hover {
+    background: rgba(255, 0, 0, 1);
+    transform: scale(1.1);
+}
+
+.image-preview-item .page-number {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    background: rgba(139, 111, 71, 0.9);
+    color: white;
+    border-radius: 12px;
+    padding: 2px 8px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+/* Dark theme styles for image preview */
+[data-theme="dark"] .image-preview-list {
+    border-color: rgba(166, 138, 100, 0.3);
+    background: rgba(45, 37, 32, 0.5);
+}
+
+[data-theme="dark"] .image-preview-item {
+    border-color: rgba(166, 138, 100, 0.3);
+    background: rgba(45, 37, 32, 0.8);
+}
+
+[data-theme="dark"] .image-preview-item:hover {
+    border-color: #a68a64;
+}
+
+[data-theme="dark"] .image-preview-item .page-number {
+    background: rgba(166, 138, 100, 0.9);
+}
 @media (max-width: 480px) {
     .navbar-links {
         flex-wrap: wrap;

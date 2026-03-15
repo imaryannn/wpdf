@@ -1,3 +1,49 @@
+/* Override any potential blocking styles */
+* {
+    pointer-events: auto !important;
+}
+
+.card {
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+.card * {
+    position: relative !important;
+    z-index: 2 !important;
+}
+
+.btn,
+.split-method,
+.compression-option,
+.orientation-option,
+.format-option,
+input[type="text"],
+input[type="number"],
+input[type="range"],
+select {
+    position: relative !important;
+    z-index: 100 !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+}
+
+input[type="text"],
+input[type="number"],
+select {
+    cursor: text !important;
+}
+
+/* Remove any pseudo-elements that might block clicks */
+.btn::before,
+.btn::after,
+.card::before,
+.card::after,
+.drop-zone::before,
+.drop-zone::after {
+    pointer-events: none !important;
+}
+
 /* Modern Ultra Enhancements */
 
 body {
@@ -41,6 +87,8 @@ body::before {
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
+    position: relative !important;
+    z-index: 100 !important;
 }
 
 .logo-text {
@@ -132,46 +180,25 @@ body::before {
     border-radius: 14px !important;
     font-weight: 600 !important;
     font-size: 16px !important;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
     position: relative;
     overflow: hidden;
     box-shadow: 0 4px 15px rgba(139, 111, 71, 0.3) !important;
+    cursor: pointer !important;
+    pointer-events: auto !important;
+    z-index: 10 !important;
 }
 
 .btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-    transition: left 0.5s ease;
-}
-
-.btn:hover::before {
-    left: 100%;
+    display: none;
 }
 
 .btn::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, #6d5637, #8b6f47);
-    opacity: 0;
-    transition: opacity 0.4s ease;
-}
-
-.btn:hover::after {
-    opacity: 1;
+    display: none;
 }
 
 .btn:hover {
-    transform: translateY(-4px) scale(1.02) !important;
-    box-shadow: 0 12px 35px rgba(139, 111, 71, 0.4) !important;
+    box-shadow: 0 6px 20px rgba(139, 111, 71, 0.4) !important;
+    transform: translateY(-2px) !important;
 }
 
 .btn > * {
@@ -285,6 +312,9 @@ select {
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
     background: rgba(255, 255, 255, 0.9) !important;
     font-size: 16px !important;
+    cursor: text !important;
+    pointer-events: auto !important;
+    z-index: 10 !important;
 }
 
 input:focus,
@@ -318,6 +348,9 @@ select:focus {
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
     border-radius: 12px !important;
     border: 2px solid rgba(139, 111, 71, 0.2) !important;
+    cursor: pointer !important;
+    pointer-events: auto !important;
+    z-index: 10 !important;
 }
 
 .split-method:hover,
@@ -352,6 +385,7 @@ select:focus {
     padding: 0.5rem;
     z-index: 101;
     order: 2;
+    position: relative;
 }
 
 .hamburger span {
@@ -360,6 +394,7 @@ select:focus {
     background: linear-gradient(135deg, #8b6f47, #a68a64);
     border-radius: 2px;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-origin: center;
 }
 
 .hamburger span:first-child {
@@ -371,14 +406,16 @@ select:focus {
 }
 
 .hamburger.active span:first-child {
-    transform: rotate(45deg) translate(5px, 5px);
+    transform: rotate(45deg) translate(3px, 3px);
     width: 26px;
 }
 
 .hamburger.active span:last-child {
-    transform: rotate(-45deg) translate(6px, -6px);
+    transform: rotate(-45deg) translate(4px, -4px);
     width: 26px;
 }
+
+
 
 @keyframes slideIn {
     from {
@@ -637,10 +674,14 @@ select:focus {
 [data-theme="dark"] .btn {
     background: linear-gradient(135deg, #a68a64, #c4a57b) !important;
     box-shadow: 0 4px 15px rgba(166, 138, 100, 0.4) !important;
+    cursor: pointer !important;
+    pointer-events: auto !important;
+    z-index: 10 !important;
 }
 
 [data-theme="dark"] .btn:hover {
-    box-shadow: 0 12px 35px rgba(166, 138, 100, 0.5) !important;
+    box-shadow: 0 8px 25px rgba(166, 138, 100, 0.5) !important;
+    transform: translateY(-2px) !important;
 }
 
 [data-theme="dark"] .drop-zone {
@@ -674,6 +715,9 @@ select:focus {
     background: rgba(45, 37, 32, 0.9) !important;
     border: 2px solid rgba(166, 138, 100, 0.3) !important;
     color: #f5f1ed !important;
+    cursor: text !important;
+    pointer-events: auto !important;
+    z-index: 10 !important;
 }
 
 [data-theme="dark"] input:focus,
@@ -701,6 +745,9 @@ select:focus {
     background: rgba(45, 37, 32, 0.8) !important;
     border: 2px solid rgba(166, 138, 100, 0.3) !important;
     color: #bcaaa0 !important;
+    cursor: pointer !important;
+    pointer-events: auto !important;
+    z-index: 10 !important;
 }
 
 [data-theme="dark"] .split-method:hover,
@@ -734,6 +781,8 @@ select:focus {
 [data-theme="dark"] .hamburger span {
     background: linear-gradient(135deg, #c4a57b, #a68a64);
 }
+
+
 
 [data-theme="dark"] .navbar-links {
     background: rgba(45, 37, 32, 0.98) !important;
