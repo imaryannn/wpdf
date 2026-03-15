@@ -599,7 +599,7 @@ select:focus {
     .hamburger span:last-child {
         width: 15px !important;
     }
-    
+.    
     .navbar-links {
         width: 100% !important;
         right: -100% !important;
