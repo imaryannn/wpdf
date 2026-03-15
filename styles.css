@@ -32,14 +32,15 @@
     display: flex;
     align-items: center;
     margin-left: 20px;
+    gap: 10px;
 }
 
 .theme-switch {
     position: relative;
     display: inline-block;
-    width: 50px;
-    height: 24px;
-    margin: 0 8px;
+    width: 70px;
+    height: 34px;
+    margin: 0;
 }
 
 .theme-switch input {
@@ -55,32 +56,81 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: var(--border);
-    transition: .3s;
+    background: linear-gradient(135deg, #faf8f5, #f5f0e8);
+    transition: .4s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid rgba(139, 111, 71, 0.2);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
 }
 
 .slider:before {
     position: absolute;
     content: "";
-    height: 18px;
-    width: 18px;
+    height: 26px;
+    width: 26px;
     left: 3px;
-    bottom: 3px;
-    background: white;
-    transition: .3s;
-    box-shadow: var(--shadow-sm);
+    bottom: 2px;
+    background: linear-gradient(135deg, #8b6f47, #a68a64);
+    transition: .4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 8px rgba(139, 111, 71, 0.4), 0 1px 3px rgba(0, 0, 0, 0.2);
+    z-index: 2;
+}
+
+.slider:after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    left: 8px;
+    bottom: 7px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23faf8f5'%3E%3Cpath d='M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.166a.75.75 0 00-1.06-1.06l-1.591 1.59a.75.75 0 101.06 1.061l1.591-1.59zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM17.834 18.894a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 10-1.061 1.06l1.59 1.591zM12 18a.75.75 0 01.75.75V21a.75.75 0 01-1.5 0v-2.25A.75.75 0 0112 18zM7.758 17.303a.75.75 0 00-1.061-1.06l-1.591 1.59a.75.75 0 001.06 1.061l1.591-1.59zM6 12a.75.75 0 01-.75.75H3a.75.75 0 010-1.5h2.25A.75.75 0 016 12zM6.697 7.757a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 00-1.061 1.06l1.59 1.591z'/%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    transition: opacity 0.3s ease, left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 1;
+    z-index: 3;
+    pointer-events: none;
+}
+
+.slider .moon-icon {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    right: 7px;
+    bottom: 7px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23faf8f5'%3E%3Cpath fill-rule='evenodd' d='M9.528 1.718a.75.75 0 01.162.819A8.97 8.97 0 009 6a9 9 0 009 9 8.97 8.97 0 003.463-.69.75.75 0 01.981.98 10.503 10.503 0 01-9.694 6.46c-5.799 0-10.5-4.701-10.5-10.5 0-4.368 2.667-8.112 6.46-9.694a.75.75 0 01.818.162z' clip-rule='evenodd'/%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    transition: opacity 0.3s ease;
+    opacity: 0;
+    z-index: 3;
+    pointer-events: none;
 }
 
 input:checked + .slider {
-    background-color: var(--primary-color);
+    background: linear-gradient(135deg, #2d2520, #1a1512);
+    border-color: rgba(166, 138, 100, 0.4);
 }
 
 input:checked + .slider:before {
-    transform: translateX(26px);
+    transform: translateX(36px);
+    background: linear-gradient(135deg, #c4a57b, #a68a64);
+    box-shadow: 0 2px 8px rgba(196, 165, 123, 0.5), 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+input:checked + .slider:after {
+    opacity: 0;
+    left: 44px;
+}
+
+input:checked + .slider .moon-icon {
+    opacity: 1;
 }
 
 .slider.round {
-    border-radius: 24px;
+    border-radius: 34px;
 }
 
 .slider.round:before {
@@ -88,8 +138,12 @@ input:checked + .slider:before {
 }
 
 .theme-switch-icon {
-    color: var(--text-color);
-    font-size: 16px;
+    display: none;
+}
+
+.theme-switch:hover .slider {
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 0 0 3px rgba(139, 111, 71, 0.1);
+    transform: scale(1.02);
 }
 
 * {
@@ -120,7 +174,6 @@ body {
 
 .navbar {
     display: flex;
-    justify-content: space-between;
     align-items: center;
     padding: 1rem 2.5rem;
     background: var(--surface);

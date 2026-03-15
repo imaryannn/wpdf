@@ -1,23 +1,31 @@
 // Theme Switcher
 function setupThemeSwitcher() {
-    const themeToggle = document.getElementById('theme-checkbox');
+    const themeToggles = document.querySelectorAll('#theme-checkbox');
     const currentTheme = localStorage.getItem('theme') || 'light';
     
     // Set initial theme based on saved preference
     if (currentTheme === 'dark') {
         document.documentElement.setAttribute('data-theme', 'dark');
-        themeToggle.checked = true;
+        themeToggles.forEach(toggle => {
+            toggle.checked = true;
+        });
     }
     
-    // Add event listener for theme toggle
-    themeToggle.addEventListener('change', function() {
-        if (this.checked) {
-            document.documentElement.setAttribute('data-theme', 'dark');
-            localStorage.setItem('theme', 'dark');
-        } else {
-            document.documentElement.setAttribute('data-theme', 'light');
-            localStorage.setItem('theme', 'light');
-        }
+    // Add event listener for all theme toggles
+    themeToggles.forEach(toggle => {
+        toggle.addEventListener('change', function() {
+            if (this.checked) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+                // Sync all toggles
+                themeToggles.forEach(t => t.checked = true);
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+                localStorage.setItem('theme', 'light');
+                // Sync all toggles
+                themeToggles.forEach(t => t.checked = false);
+            }
+        });
     });
 }
 
