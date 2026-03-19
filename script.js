@@ -72,6 +72,11 @@ function initializeUpload() {
     const extractFileInput = document.getElementById('extract-file-input');
     const extractBrowseBtn = document.getElementById('extract-browse-btn');
     
+    // Docs to PDF section
+    const docsDropZone = document.getElementById('docs-drop-zone');
+    const docsFileInput = document.getElementById('docs-file-input');
+    const docsBrowseBtn = document.getElementById('docs-browse-btn');
+    
     let uploadedFiles = [];
     
     // Setup PDF Merger upload
@@ -150,6 +155,46 @@ function initializeUpload() {
                 
                 // Show PDF page preview for selection
                 await showPDFPagePreview(files[0]);
+            }
+        });
+    }
+    
+    // Setup Docs to PDF upload
+    if (docsDropZone && docsFileInput) {
+        setupUploadSection(docsDropZone, docsFileInput, docsBrowseBtn, (files) => {
+            console.log('Docs files selected:', files.length);
+            const supportedFiles = Array.from(files).filter(file => {
+                const supportedTypes = [
+                    'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // DOCX
+                    'application/vnd.openxmlformats-officedocument.presentationml.presentation', // PPTX
+                    'text/plain', // TXT
+                    'application/rtf', // RTF
+                    'text/html', // HTML
+                    'text/htm' // HTM
+                ];
+                return supportedTypes.includes(file.type) || 
+                       file.name.toLowerCase().endsWith('.docx') ||
+                       file.name.toLowerCase().endsWith('.pptx') ||
+                       file.name.toLowerCase().endsWith('.txt') ||
+                       file.name.toLowerCase().endsWith('.rtf') ||
+                       file.name.toLowerCase().endsWith('.html') ||
+                       file.name.toLowerCase().endsWith('.htm');
+            });
+            
+            if (supportedFiles.length > 0) {
+                const prompt = docsDropZone.querySelector('.drop-zone-prompt');
+                if (prompt) {
+                    prompt.innerHTML = `Selected ${supportedFiles.length} document(s)<br><small>Ready for conversion</small>`;
+                }
+                const docsOptions = document.getElementById('docs-options');
+                if (docsOptions) {
+                    docsOptions.style.display = 'block';
+                }
+                
+                // Show document preview
+                showDocsPreview(supportedFiles);
+            } else {
+                showAlert('Please select supported document files (DOCX, PPTX, TXT, RTF, HTML)', 'danger');
             }
         });
     }
@@ -337,6 +382,9 @@ function initializeUpload() {
     
     // Initialize PDF processing functionality
     initializePDFProcessing();
+    
+    // Initialize Docs to PDF functionality
+    initializeDocsProcessing();
     
     // Initialize PDF Merger workflow buttons
     initializeMergerWorkflow();
@@ -764,7 +812,8 @@ function initializeNavigation() {
         'PDF Splitter': document.getElementById('pdf-splitter-section'),
         'PDF Compressor': document.getElementById('pdf-compressor-section'),
         'Images to PDF': document.getElementById('images-to-pdf-section'),
-        'PDF to Images': document.getElementById('pdf-to-images-section')
+        'PDF to Images': document.getElementById('pdf-to-images-section'),
+        'Docs to PDF': document.getElementById('docs-to-pdf-section')
     };
     
     navFeatures.forEach(feature => {
@@ -1370,4 +1419,387 @@ function initializePageSelectionControls() {
             deselectAllPages();
         });
     }
+}
+// Docs to PDF Functions
+function showDocsPreview(docFiles) {
+    const docsPreviewContainer = document.getElementById('docs-preview-container');
+    const docsPreviewList = document.getElementById('docs-preview-list');
+    
+    if (!docsPreviewContainer || !docsPreviewList) {
+        console.error('Docs preview elements not found');
+        return;
+    }
+    
+    // Clear existing previews
+    docsPreviewList.innerHTML = '';
+    
+    // Create preview items for each document
+    docFiles.forEach((file, index) => {
+        const previewItem = document.createElement('div');
+        previewItem.className = 'docs-preview-item';
+        previewItem.dataset.fileName = file.name;
+        
+        // Get file icon based on type
+        const fileIcon = getFileIcon(file);
+        
+        // Create file icon element
+        const iconDiv = document.createElement('div');
+        iconDiv.className = 'docs-file-icon';
+        iconDiv.innerHTML = `<i class="${fileIcon}"></i>`;
+        
+        // Create file info
+        const fileInfo = document.createElement('div');
+        fileInfo.className = 'docs-file-info';
+        
+        const fileName = document.createElement('div');
+        fileName.className = 'docs-file-name';
+        fileName.textContent = file.name;
+        
+        const fileDetails = document.createElement('div');
+        fileDetails.className = 'docs-file-details';
+        fileDetails.textContent = `${getFileType(file)} • ${formatFileSize(file.size)}`;
+        
+        fileInfo.appendChild(fileName);
+        fileInfo.appendChild(fileDetails);
+        
+        // Create remove button
+        const actionsDiv = document.createElement('div');
+        actionsDiv.className = 'docs-file-actions';
+        
+        const removeBtn = document.createElement('button');
+        removeBtn.className = 'btn-remove-doc';
+        removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+        removeBtn.onclick = () => removeDocFromPreview(previewItem);
+        
+        actionsDiv.appendChild(removeBtn);
+        
+        // Assemble preview item
+        previewItem.appendChild(iconDiv);
+        previewItem.appendChild(fileInfo);
+        previewItem.appendChild(actionsDiv);
+        
+        docsPreviewList.appendChild(previewItem);
+    });
+    
+    // Show the preview container
+    docsPreviewContainer.style.display = 'block';
+}
+
+function getFileIcon(file) {
+    const extension = file.name.toLowerCase().split('.').pop();
+    const iconMap = {
+        'docx': 'fas fa-file-word',
+        'pptx': 'fas fa-file-powerpoint',
+        'txt': 'fas fa-file-alt',
+        'rtf': 'fas fa-file-alt',
+        'html': 'fas fa-code',
+        'htm': 'fas fa-code'
+    };
+    return iconMap[extension] || 'fas fa-file';
+}
+
+function getFileType(file) {
+    const extension = file.name.toLowerCase().split('.').pop();
+    const typeMap = {
+        'docx': 'Word Document',
+        'pptx': 'PowerPoint Presentation',
+        'txt': 'Text File',
+        'rtf': 'Rich Text Format',
+        'html': 'HTML Document',
+        'htm': 'HTML Document'
+    };
+    return typeMap[extension] || 'Document';
+}
+
+function removeDocFromPreview(previewItem) {
+    const fileName = previewItem.dataset.fileName;
+    
+    // Remove from preview
+    previewItem.remove();
+    
+    // Check if any documents remain
+    const remainingItems = document.querySelectorAll('.docs-preview-item');
+    if (remainingItems.length === 0) {
+        const docsPreviewContainer = document.getElementById('docs-preview-container');
+        const docsOptions = document.getElementById('docs-options');
+        
+        if (docsPreviewContainer) {
+            docsPreviewContainer.style.display = 'none';
+        }
+        
+        if (docsOptions) {
+            docsOptions.style.display = 'none';
+        }
+        
+        // Reset file input
+        const docsFileInput = document.getElementById('docs-file-input');
+        if (docsFileInput) {
+            docsFileInput.value = '';
+        }
+        
+        // Reset drop zone prompt
+        const docsDropZone = document.getElementById('docs-drop-zone');
+        const prompt = docsDropZone.querySelector('.drop-zone-prompt');
+        if (prompt) {
+            prompt.innerHTML = 'Drag & drop documents here or click to browse<br><small>Supports: DOCX, PPTX, TXT, RTF, HTML</small>';
+        }
+        
+        showAlert('All documents removed', 'info');
+    } else {
+        showAlert(`Removed ${fileName}`, 'info');
+    }
+}
+
+function initializeDocsProcessing() {
+    console.log('Initializing Docs to PDF processing...');
+    
+    // Page size selection
+    const docsPageSize = document.getElementById('docs-page-size');
+    let pageSize = 'a4';
+    
+    if (docsPageSize) {
+        docsPageSize.addEventListener('change', () => {
+            pageSize = docsPageSize.value;
+        });
+    }
+    
+    // Orientation options
+    const orientationOptions = document.querySelectorAll('#docs-to-pdf-section .orientation-option');
+    let orientation = 'portrait';
+    
+    if (orientationOptions.length > 0) {
+        orientationOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                orientationOptions.forEach(o => o.classList.remove('active'));
+                this.classList.add('active');
+                orientation = this.dataset.orientation;
+            });
+        });
+    }
+    
+    // Convert button
+    const convertDocsBtn = document.getElementById('convert-docs-btn');
+    
+    if (convertDocsBtn) {
+        convertDocsBtn.addEventListener('click', async function() {
+            const docsFileInput = document.getElementById('docs-file-input');
+            if (!docsFileInput || docsFileInput.files.length === 0) {
+                showAlert('Please select document files to convert', 'danger');
+                return;
+            }
+            
+            // Get conversion settings
+            const settings = getConversionSettings();
+            
+            convertDocsBtn.disabled = true;
+            convertDocsBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Converting...';
+            
+            try {
+                await convertDocumentsToPDF(docsFileInput.files, settings);
+                showAlert('Documents successfully converted to PDF! Check your downloads.', 'success');
+            } catch (error) {
+                showAlert('Error converting documents: ' + error.message, 'danger');
+                console.error('Error:', error);
+            } finally {
+                convertDocsBtn.disabled = false;
+                convertDocsBtn.innerHTML = '<i class="fas fa-file-pdf"></i> Convert to PDF';
+            }
+        });
+    }
+}
+
+function getConversionSettings() {
+    return {
+        pageSize: document.getElementById('docs-page-size')?.value || 'a4',
+        orientation: document.querySelector('#docs-to-pdf-section .orientation-option.active')?.dataset.orientation || 'portrait',
+        preserveFormatting: document.getElementById('preserve-formatting')?.checked || true,
+        includeHeadersFooters: document.getElementById('include-headers-footers')?.checked || true,
+        embedFonts: document.getElementById('embed-fonts')?.checked || false,
+        optimizeImages: document.getElementById('optimize-images')?.checked || false,
+        margins: {
+            top: parseInt(document.getElementById('margin-top')?.value || '20', 10),
+            right: parseInt(document.getElementById('margin-right')?.value || '20', 10),
+            bottom: parseInt(document.getElementById('margin-bottom')?.value || '20', 10),
+            left: parseInt(document.getElementById('margin-left')?.value || '20', 10)
+        }
+    };
+}
+
+async function convertDocumentsToPDF(files, settings) {
+    const { PDFDocument, PageSizes, rgb } = PDFLib;
+    
+    // Get page dimensions
+    let pageWidth, pageHeight;
+    switch (settings.pageSize) {
+        case 'a4':
+            [pageWidth, pageHeight] = PageSizes.A4;
+            break;
+        case 'letter':
+            [pageWidth, pageHeight] = PageSizes.Letter;
+            break;
+        case 'legal':
+            [pageWidth, pageHeight] = PageSizes.Legal;
+            break;
+        case 'a3':
+            [pageWidth, pageHeight] = PageSizes.A3;
+            break;
+        default:
+            [pageWidth, pageHeight] = PageSizes.A4;
+    }
+    
+    if (settings.orientation === 'landscape') {
+        [pageWidth, pageHeight] = [pageHeight, pageWidth];
+    }
+    
+    // Convert margins from mm to points (1mm = 2.834645669 points)
+    const marginTop = settings.margins.top * 2.834645669;
+    const marginRight = settings.margins.right * 2.834645669;
+    const marginBottom = settings.margins.bottom * 2.834645669;
+    const marginLeft = settings.margins.left * 2.834645669;
+    
+    // Process each file
+    for (const file of files) {
+        try {
+            const pdfDoc = await PDFDocument.create();
+            
+            // Read file content
+            const content = await readFileAsText(file);
+            
+            // Convert based on file type
+            const extension = file.name.toLowerCase().split('.').pop();
+            
+            switch (extension) {
+                case 'txt':
+                case 'rtf':
+                    await convertTextToPDF(pdfDoc, content, pageWidth, pageHeight, marginLeft, marginTop, marginRight, marginBottom, settings);
+                    break;
+                case 'html':
+                case 'htm':
+                    await convertHTMLToPDF(pdfDoc, content, pageWidth, pageHeight, marginLeft, marginTop, marginRight, marginBottom, settings);
+                    break;
+                case 'docx':
+                    await convertDOCXToPDF(pdfDoc, file, pageWidth, pageHeight, marginLeft, marginTop, marginRight, marginBottom, settings);
+                    break;
+                case 'pptx':
+                    await convertPPTXToPDF(pdfDoc, file, pageWidth, pageHeight, marginLeft, marginTop, marginRight, marginBottom, settings);
+                    break;
+                default:
+                    throw new Error(`Unsupported file type: ${extension}`);
+            }
+            
+            // Save and download PDF
+            const pdfBytes = await pdfDoc.save();
+            const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+            const filename = `${file.name.replace(/\.[^/.]+$/, '')}_converted.pdf`;
+            download(blob, filename, 'application/pdf');
+            
+        } catch (error) {
+            console.error(`Error converting ${file.name}:`, error);
+            throw new Error(`Failed to convert ${file.name}: ${error.message}`);
+        }
+    }
+}
+
+async function convertTextToPDF(pdfDoc, content, pageWidth, pageHeight, marginLeft, marginTop, marginRight, marginBottom, settings) {
+    const page = pdfDoc.addPage([pageWidth, pageHeight]);
+    
+    const fontSize = 12;
+    const lineHeight = fontSize * 1.2;
+    const maxWidth = pageWidth - marginLeft - marginRight;
+    const maxHeight = pageHeight - marginTop - marginBottom;
+    
+    // Split content into lines that fit the page width
+    const lines = wrapText(content, maxWidth, fontSize);
+    
+    let currentY = pageHeight - marginTop;
+    let currentPage = page;
+    
+    for (const line of lines) {
+        if (currentY - lineHeight < marginBottom) {
+            // Create new page
+            currentPage = pdfDoc.addPage([pageWidth, pageHeight]);
+            currentY = pageHeight - marginTop;
+        }
+        
+        currentPage.drawText(line, {
+            x: marginLeft,
+            y: currentY,
+            size: fontSize,
+            color: rgb(0, 0, 0)
+        });
+        
+        currentY -= lineHeight;
+    }
+}
+
+async function convertHTMLToPDF(pdfDoc, htmlContent, pageWidth, pageHeight, marginLeft, marginTop, marginRight, marginBottom, settings) {
+    // Simple HTML to text conversion (basic implementation)
+    // Remove HTML tags and convert to plain text
+    const textContent = htmlContent
+        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+        .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
+        .replace(/<[^>]*>/g, '')
+        .replace(/&nbsp;/g, ' ')
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"')
+        .trim();
+    
+    await convertTextToPDF(pdfDoc, textContent, pageWidth, pageHeight, marginLeft, marginTop, marginRight, marginBottom, settings);
+}
+
+async function convertDOCXToPDF(pdfDoc, file, pageWidth, pageHeight, marginLeft, marginTop, marginRight, marginBottom, settings) {
+    // For DOCX files, we'll extract text content (basic implementation)
+    // In a full implementation, you'd use a library like mammoth.js
+    showAlert('DOCX conversion uses basic text extraction. For full formatting support, consider using a dedicated converter.', 'info');
+    
+    const content = await readFileAsText(file);
+    await convertTextToPDF(pdfDoc, content, pageWidth, pageHeight, marginLeft, marginTop, marginRight, marginBottom, settings);
+}
+
+async function convertPPTXToPDF(pdfDoc, file, pageWidth, pageHeight, marginLeft, marginTop, marginRight, marginBottom, settings) {
+    // For PPTX files, we'll extract text content (basic implementation)
+    showAlert('PPTX conversion uses basic text extraction. For full slide layouts, consider using a dedicated converter.', 'info');
+    
+    const content = await readFileAsText(file);
+    await convertTextToPDF(pdfDoc, content, pageWidth, pageHeight, marginLeft, marginTop, marginRight, marginBottom, settings);
+}
+
+function wrapText(text, maxWidth, fontSize) {
+    const words = text.split(/\s+/);
+    const lines = [];
+    let currentLine = '';
+    
+    // Approximate character width (this is a rough estimate)
+    const charWidth = fontSize * 0.6;
+    const maxCharsPerLine = Math.floor(maxWidth / charWidth);
+    
+    for (const word of words) {
+        const testLine = currentLine + (currentLine ? ' ' : '') + word;
+        
+        if (testLine.length <= maxCharsPerLine) {
+            currentLine = testLine;
+        } else {
+            if (currentLine) {
+                lines.push(currentLine);
+            }
+            currentLine = word;
+        }
+    }
+    
+    if (currentLine) {
+        lines.push(currentLine);
+    }
+    
+    return lines;
+}
+
+function readFileAsText(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsText(file);
+    });
 }
