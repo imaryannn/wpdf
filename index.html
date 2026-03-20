@@ -34,6 +34,7 @@
             <div class="navbar-feature">Images to PDF</div>
             <div class="navbar-feature">PDF to Images</div>
             <div class="navbar-feature">PDF Security</div>
+            <div class="navbar-feature">PDF Watermark</div>
             <div class="navbar-feature">Docs to PDF</div>
             <div class="theme-switch-wrapper">
                 <label class="theme-switch" for="theme-checkbox-mobile">
@@ -672,6 +673,253 @@
                             </div>
                             <h3>4. Download</h3>
                             <p>Download your secured or unlocked PDF</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- PDF WATERMARK SECTION -->
+        <section id="pdf-watermark-section" style="display: none;">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-tint"></i> Add Watermark to PDF
+                </div>
+                
+                <div class="form-group">
+                    <div id="watermark-drop-zone" class="drop-zone">
+                        <div class="drop-zone-icon">
+                            <i class="fas fa-file-pdf"></i>
+                        </div>
+                        <div class="drop-zone-prompt">
+                            Drag & drop a PDF file here or click to browse
+                        </div>
+                        <button type="button" id="watermark-browse-btn" class="btn btn-secondary" style="margin-top: 1rem;">
+                            <i class="fas fa-folder-open"></i> Browse Files
+                        </button>
+                    </div>
+                    <input type="file" id="watermark-file-input" accept=".pdf" class="drop-zone-input" style="position: absolute; left: -9999px; opacity: 0;">
+                </div>
+                
+                <div id="watermark-options" style="display: none;">
+                    <div class="form-group">
+                        <label class="form-label">Watermark Type</label>
+                        <div class="watermark-type-options">
+                            <div class="watermark-type active" data-type="text">
+                                <i class="fas fa-font"></i> Text Watermark
+                            </div>
+                            <div class="watermark-type" data-type="image">
+                                <i class="fas fa-image"></i> Image Watermark
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Text Watermark Options -->
+                    <div id="text-watermark-options">
+                        <div class="form-group">
+                            <label class="form-label">Watermark Text</label>
+                            <input type="text" id="watermark-text" class="form-control" placeholder="Enter watermark text" value="CONFIDENTIAL">
+                        </div>
+                        
+                        <div class="watermark-settings-grid">
+                            <div class="setting-group">
+                                <label class="setting-label">Font Family</label>
+                                <select id="font-family" class="form-control">
+                                    <option value="Helvetica">Helvetica</option>
+                                    <option value="Times-Roman">Times Roman</option>
+                                    <option value="Courier">Courier</option>
+                                </select>
+                            </div>
+                            
+                            <div class="setting-group">
+                                <label class="setting-label">Font Size: <span id="font-size-value">24px</span></label>
+                                <input type="range" id="font-size" min="8" max="72" value="24" class="form-range">
+                            </div>
+                            
+                            <div class="setting-group">
+                                <label class="setting-label">Text Color</label>
+                                <input type="color" id="text-color" value="#ff0000" class="form-control">
+                            </div>
+                            
+                            <div class="setting-group">
+                                <label class="setting-label">Font Style</label>
+                                <select id="font-style" class="form-control">
+                                    <option value="normal">Normal</option>
+                                    <option value="bold">Bold</option>
+                                    <option value="italic">Italic</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Image Watermark Options -->
+                    <div id="image-watermark-options" style="display: none;">
+                        <div class="form-group">
+                            <div id="watermark-image-upload" class="drop-zone" style="min-height: 120px;">
+                                <div class="drop-zone-icon">
+                                    <i class="fas fa-image"></i>
+                                </div>
+                                <div class="drop-zone-prompt">
+                                    Drag & drop an image here or click to browse
+                                </div>
+                                <button type="button" id="image-browse-btn" class="btn btn-secondary" style="margin-top: 1rem;">
+                                    <i class="fas fa-folder-open"></i> Browse Images
+                                </button>
+                            </div>
+                            <input type="file" id="watermark-image-input" accept="image/*" class="drop-zone-input" style="position: absolute; left: -9999px; opacity: 0;">
+                        </div>
+                        
+                        <div id="image-preview-container" style="display: none;">
+                            <div class="form-group">
+                                <label class="form-label">Image Preview</label>
+                                <div class="watermark-image-preview">
+                                    <img id="watermark-image-preview" src="" alt="Watermark preview" style="max-width: 200px; max-height: 150px; border: 1px solid #ddd; border-radius: 4px;">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="setting-group">
+                            <label class="setting-label">Image Scale: <span id="image-scale-value">100%</span></label>
+                            <input type="range" id="image-scale" min="10" max="200" value="100" class="form-range">
+                        </div>
+                    </div>
+                    
+                    <!-- Common Watermark Settings -->
+                    <div class="form-group">
+                        <label class="form-label">Position</label>
+                        <div class="position-grid">
+                            <div class="position-option" data-position="top-left"><i class="fas fa-arrow-up"></i><i class="fas fa-arrow-left"></i></div>
+                            <div class="position-option" data-position="top-center"><i class="fas fa-arrow-up"></i></div>
+                            <div class="position-option" data-position="top-right"><i class="fas fa-arrow-up"></i><i class="fas fa-arrow-right"></i></div>
+                            <div class="position-option" data-position="center-left"><i class="fas fa-arrow-left"></i></div>
+                            <div class="position-option active" data-position="center"><i class="fas fa-dot-circle"></i></div>
+                            <div class="position-option" data-position="center-right"><i class="fas fa-arrow-right"></i></div>
+                            <div class="position-option" data-position="bottom-left"><i class="fas fa-arrow-down"></i><i class="fas fa-arrow-left"></i></div>
+                            <div class="position-option" data-position="bottom-center"><i class="fas fa-arrow-down"></i></div>
+                            <div class="position-option" data-position="bottom-right"><i class="fas fa-arrow-down"></i><i class="fas fa-arrow-right"></i></div>
+                        </div>
+                    </div>
+                    
+                    <div class="watermark-settings-grid">
+                        <div class="setting-group">
+                            <label class="setting-label">Opacity: <span id="opacity-value">50%</span></label>
+                            <input type="range" id="opacity-slider" min="10" max="100" value="50" class="form-range">
+                        </div>
+                        
+                        <div class="setting-group">
+                            <label class="setting-label">Rotation: <span id="rotation-value">0°</span></label>
+                            <input type="range" id="rotation-slider" min="-45" max="45" value="0" class="form-range">
+                        </div>
+                        
+                        <div class="setting-group">
+                            <label class="setting-label">Apply to Pages</label>
+                            <select id="page-selection" class="form-control">
+                                <option value="all">All Pages</option>
+                                <option value="first">First Page Only</option>
+                                <option value="last">Last Page Only</option>
+                                <option value="range">Custom Range</option>
+                            </select>
+                        </div>
+                        
+                        <div class="setting-group" id="page-range-group" style="display: none;">
+                            <label class="setting-label">Page Range</label>
+                            <input type="text" id="page-range" class="form-control" placeholder="e.g., 1-5, 8, 10-12">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group" style="text-align: center;">
+                        <button id="apply-watermark-btn" class="btn btn-primary">
+                            <i class="fas fa-tint"></i> Apply Watermark
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-info-circle"></i> Watermark Features
+                </div>
+                
+                <div class="watermark-features">
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-font"></i>
+                        </div>
+                        <div class="feature-content">
+                            <h4>Text Watermarks</h4>
+                            <p>Add custom text with full control over font, size, color, and style</p>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-image"></i>
+                        </div>
+                        <div class="feature-content">
+                            <h4>Image Watermarks</h4>
+                            <p>Upload your logo or image and scale it to the perfect size</p>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-crosshairs"></i>
+                        </div>
+                        <div class="feature-content">
+                            <h4>Flexible Positioning</h4>
+                            <p>Choose from 9 preset positions or set custom coordinates</p>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-adjust"></i>
+                        </div>
+                        <div class="feature-content">
+                            <h4>Opacity & Rotation</h4>
+                            <p>Control transparency and rotation angle for perfect integration</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-info-circle"></i> How It Works
+                </div>
+                
+                <div class="how-it-works">
+                    <div class="steps">
+                        <div class="step">
+                            <div class="step-icon">
+                                <i class="fas fa-upload"></i>
+                            </div>
+                            <h3>1. Upload</h3>
+                            <p>Upload the PDF file you want to watermark</p>
+                        </div>
+                        
+                        <div class="step">
+                            <div class="step-icon">
+                                <i class="fas fa-cog"></i>
+                            </div>
+                            <h3>2. Configure</h3>
+                            <p>Choose text or image watermark and customize settings</p>
+                        </div>
+                        
+                        <div class="step">
+                            <div class="step-icon">
+                                <i class="fas fa-crosshairs"></i>
+                            </div>
+                            <h3>3. Position</h3>
+                            <p>Select position, opacity, and rotation for your watermark</p>
+                        </div>
+                        
+                        <div class="step">
+                            <div class="step-icon">
+                                <i class="fas fa-download"></i>
+                            </div>
+                            <h3>4. Download</h3>
+                            <p>Apply watermark and download your protected PDF</p>
                         </div>
                     </div>
                 </div>
