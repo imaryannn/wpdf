@@ -827,6 +827,25 @@
                         </div>
                     </div>
                     
+                    <!-- Watermark Preview -->
+                    <div id="watermark-preview-section" style="display: none;">
+                        <div class="form-group">
+                            <label class="form-label">Watermark Preview</label>
+                            <div id="watermark-preview-container">
+                                <div id="watermark-preview-canvas-container">
+                                    <canvas id="watermark-preview-canvas" width="400" height="300"></canvas>
+                                    <div id="watermark-preview-overlay"></div>
+                                </div>
+                                <div class="preview-controls">
+                                    <button type="button" id="update-preview-btn" class="btn btn-secondary btn-sm">
+                                        <i class="fas fa-eye"></i> Update Preview
+                                    </button>
+                                    <span class="preview-note">Preview shows first page with watermark</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div class="form-group" style="text-align: center;">
                         <button id="apply-watermark-btn" class="btn btn-primary">
                             <i class="fas fa-tint"></i> Apply Watermark

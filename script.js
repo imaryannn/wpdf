@@ -2237,11 +2237,13 @@ function initializeWatermarking() {
     const watermarkDropZone = document.getElementById('watermark-drop-zone');
     const watermarkFileInput = document.getElementById('watermark-file-input');
     const watermarkBrowseBtn = document.getElementById('watermark-browse-btn');
+    let currentPdfFile = null;
     
     if (watermarkDropZone && watermarkFileInput) {
-        setupUploadSection(watermarkDropZone, watermarkFileInput, watermarkBrowseBtn, (files) => {
+        setupUploadSection(watermarkDropZone, watermarkFileInput, watermarkBrowseBtn, async (files) => {
             console.log('Watermark files selected:', files.length);
             if (files.length > 0 && files[0].type === 'application/pdf') {
+                currentPdfFile = files[0];
                 const prompt = watermarkDropZone.querySelector('.drop-zone-prompt');
                 if (prompt) {
                     prompt.textContent = `Selected: ${files[0].name}`;
@@ -2250,6 +2252,9 @@ function initializeWatermarking() {
                 if (watermarkOptions) {
                     watermarkOptions.style.display = 'block';
                 }
+                
+                // Initialize preview
+                await initializeWatermarkPreview(currentPdfFile);
             }
         });
     }
@@ -2274,6 +2279,9 @@ function initializeWatermarking() {
                     textWatermarkOptions.style.display = 'none';
                     imageWatermarkOptions.style.display = 'block';
                 }
+                
+                // Update preview when type changes
+                updateWatermarkPreview();
             });
         });
     }
@@ -2295,6 +2303,9 @@ function initializeWatermarking() {
                         preview.src = e.target.result;
                         container.style.display = 'block';
                     }
+                    
+                    // Update preview when image changes
+                    updateWatermarkPreview();
                 };
                 reader.readAsDataURL(file);
                 
@@ -2316,16 +2327,20 @@ function initializeWatermarking() {
                 positionOptions.forEach(o => o.classList.remove('active'));
                 this.classList.add('active');
                 selectedPosition = this.dataset.position;
+                
+                // Update preview when position changes
+                updateWatermarkPreview();
             });
         });
     }
     
-    // Range sliders with value display
+    // Range sliders with value display and preview updates
     const fontSizeSlider = document.getElementById('font-size');
     const fontSizeValue = document.getElementById('font-size-value');
     if (fontSizeSlider && fontSizeValue) {
         fontSizeSlider.addEventListener('input', () => {
             fontSizeValue.textContent = fontSizeSlider.value + 'px';
+            updateWatermarkPreview();
         });
     }
     
@@ -2334,6 +2349,7 @@ function initializeWatermarking() {
     if (imageScaleSlider && imageScaleValue) {
         imageScaleSlider.addEventListener('input', () => {
             imageScaleValue.textContent = imageScaleSlider.value + '%';
+            updateWatermarkPreview();
         });
     }
     
@@ -2342,6 +2358,7 @@ function initializeWatermarking() {
     if (opacitySlider && opacityValue) {
         opacitySlider.addEventListener('input', () => {
             opacityValue.textContent = opacitySlider.value + '%';
+            updateWatermarkPreview();
         });
     }
     
@@ -2350,7 +2367,29 @@ function initializeWatermarking() {
     if (rotationSlider && rotationValue) {
         rotationSlider.addEventListener('input', () => {
             rotationValue.textContent = rotationSlider.value + '°';
+            updateWatermarkPreview();
         });
+    }
+    
+    // Text input changes
+    const watermarkTextInput = document.getElementById('watermark-text');
+    if (watermarkTextInput) {
+        watermarkTextInput.addEventListener('input', updateWatermarkPreview);
+    }
+    
+    const textColorInput = document.getElementById('text-color');
+    if (textColorInput) {
+        textColorInput.addEventListener('change', updateWatermarkPreview);
+    }
+    
+    const fontFamilySelect = document.getElementById('font-family');
+    if (fontFamilySelect) {
+        fontFamilySelect.addEventListener('change', updateWatermarkPreview);
+    }
+    
+    const fontStyleSelect = document.getElementById('font-style');
+    if (fontStyleSelect) {
+        fontStyleSelect.addEventListener('change', updateWatermarkPreview);
     }
     
     // Page selection
@@ -2364,6 +2403,12 @@ function initializeWatermarking() {
                 pageRangeGroup.style.display = 'none';
             }
         });
+    }
+    
+    // Update preview button
+    const updatePreviewBtn = document.getElementById('update-preview-btn');
+    if (updatePreviewBtn) {
+        updatePreviewBtn.addEventListener('click', updateWatermarkPreview);
     }
     
     // Apply watermark button
@@ -2393,7 +2438,7 @@ function initializeWatermarking() {
             
             applyWatermarkBtn.disabled = true;
             const originalText = applyWatermarkBtn.innerHTML;
-            applyWatermarkBtn.innerHTML = '<i class=\"fas fa-spinner fa-spin\"></i> Applying Watermark...';
+            applyWatermarkBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Applying Watermark...';
             
             try {
                 await applyWatermarkToPDF(file, settings);
@@ -2406,6 +2451,152 @@ function initializeWatermarking() {
                 applyWatermarkBtn.innerHTML = originalText;
             }
         });
+    }
+}
+
+// Initialize watermark preview
+async function initializeWatermarkPreview(pdfFile) {
+    const previewSection = document.getElementById('watermark-preview-section');
+    const canvas = document.getElementById('watermark-preview-canvas');
+    const overlay = document.getElementById('watermark-preview-overlay');
+    
+    if (!previewSection || !canvas || !pdfFile) return;
+    
+    try {
+        // Load first page of PDF
+        const arrayBuffer = await readFileAsArrayBuffer(pdfFile);
+        const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+        const pdf = await loadingTask.promise;
+        const page = await pdf.getPage(1);
+        
+        // Set canvas size
+        const viewport = page.getViewport({ scale: 0.8 });
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        
+        // Render PDF page
+        const context = canvas.getContext('2d');
+        await page.render({
+            canvasContext: context,
+            viewport: viewport
+        }).promise;
+        
+        // Show preview section
+        previewSection.style.display = 'block';
+        
+        // Initial watermark preview
+        updateWatermarkPreview();
+        
+    } catch (error) {
+        console.error('Error initializing preview:', error);
+        showAlert('Error loading PDF preview', 'danger');
+    }
+}
+
+// Update watermark preview
+function updateWatermarkPreview() {
+    const canvas = document.getElementById('watermark-preview-canvas');
+    const overlay = document.getElementById('watermark-preview-overlay');
+    
+    if (!canvas || !overlay) return;
+    
+    // Clear existing watermark elements
+    overlay.innerHTML = '';
+    
+    const settings = getWatermarkSettings();
+    const canvasRect = canvas.getBoundingClientRect();
+    const canvasWidth = canvas.width;
+    const canvasHeight = canvas.height;
+    
+    if (settings.type === 'text' && settings.text.trim()) {
+        addTextWatermarkPreview(overlay, settings, canvasWidth, canvasHeight);
+    } else if (settings.type === 'image' && settings.imageFile) {
+        addImageWatermarkPreview(overlay, settings, canvasWidth, canvasHeight);
+    }
+}
+
+// Add text watermark to preview
+function addTextWatermarkPreview(overlay, settings, canvasWidth, canvasHeight) {
+    const textElement = document.createElement('div');
+    textElement.className = 'watermark-preview-text';
+    textElement.textContent = settings.text;
+    
+    // Apply text styles
+    textElement.style.fontSize = settings.fontSize + 'px';
+    textElement.style.color = settings.textColor;
+    textElement.style.fontFamily = settings.fontFamily;
+    textElement.style.opacity = settings.opacity / 100;
+    textElement.style.transform = `rotate(${settings.rotation}deg)`;
+    
+    if (settings.fontStyle === 'bold') {
+        textElement.style.fontWeight = 'bold';
+    } else if (settings.fontStyle === 'italic') {
+        textElement.style.fontStyle = 'italic';
+    }
+    
+    // Calculate position
+    const position = calculatePreviewPosition(settings.position, canvasWidth, canvasHeight, settings.fontSize * settings.text.length * 0.6, settings.fontSize);
+    textElement.style.left = position.x + 'px';
+    textElement.style.top = position.y + 'px';
+    
+    overlay.appendChild(textElement);
+}
+
+// Add image watermark to preview
+function addImageWatermarkPreview(overlay, settings, canvasWidth, canvasHeight) {
+    const imageElement = document.createElement('img');
+    imageElement.className = 'watermark-preview-image';
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        imageElement.src = e.target.result;
+        imageElement.onload = function() {
+            // Calculate scaled dimensions
+            const scale = settings.imageScale / 100;
+            const imgWidth = this.naturalWidth * scale * 0.2; // Scale down for preview
+            const imgHeight = this.naturalHeight * scale * 0.2;
+            
+            imageElement.style.width = imgWidth + 'px';
+            imageElement.style.height = imgHeight + 'px';
+            imageElement.style.opacity = settings.opacity / 100;
+            imageElement.style.transform = `rotate(${settings.rotation}deg)`;
+            
+            // Calculate position
+            const position = calculatePreviewPosition(settings.position, canvasWidth, canvasHeight, imgWidth, imgHeight);
+            imageElement.style.left = position.x + 'px';
+            imageElement.style.top = position.y + 'px';
+        };
+    };
+    reader.readAsDataURL(settings.imageFile);
+    
+    overlay.appendChild(imageElement);
+}
+
+// Calculate watermark position for preview
+function calculatePreviewPosition(position, canvasWidth, canvasHeight, itemWidth, itemHeight) {
+    const margin = 20; // Margin from edges for preview
+    
+    switch (position) {
+        case 'top-left':
+            return { x: margin, y: margin };
+        case 'top-center':
+            return { x: (canvasWidth - itemWidth) / 2, y: margin };
+        case 'top-right':
+            return { x: canvasWidth - itemWidth - margin, y: margin };
+        case 'center-left':
+            return { x: margin, y: (canvasHeight - itemHeight) / 2 };
+        case 'center':
+            return { x: (canvasWidth - itemWidth) / 2, y: (canvasHeight - itemHeight) / 2 };
+        case 'center-right':
+            return { x: canvasWidth - itemWidth - margin, y: (canvasHeight - itemHeight) / 2 };
+        case 'bottom-left':
+            return { x: margin, y: canvasHeight - itemHeight - margin };
+        case 'bottom-center':
+            return { x: (canvasWidth - itemWidth) / 2, y: canvasHeight - itemHeight - margin };
+        case 'bottom-right':
+            return { x: canvasWidth - itemWidth - margin, y: canvasHeight - itemHeight - margin };
+        default:
+            return { x: (canvasWidth - itemWidth) / 2, y: (canvasHeight - itemHeight) / 2 };
     }
 }
 
