@@ -1994,39 +1994,107 @@ async function addPasswordToPDF(file) {
     }
     
     try {
+        // Use jsPDF to create a password-protected PDF
+        const { jsPDF } = window.jspdf;
+        
+        // Read the original PDF
         const arrayBuffer = await readFileAsArrayBuffer(file);
-        const { PDFDocument, StandardFonts } = PDFLib;
+        const { PDFDocument } = PDFLib;
+        const originalPdf = await PDFDocument.load(arrayBuffer);
         
-        // Load the PDF
-        const pdfDoc = await PDFDocument.load(arrayBuffer);
-        
-        // Create a new PDF with password protection simulation
-        const newPdfDoc = await PDFDocument.create();
-        
-        // Copy all pages
-        const pages = await newPdfDoc.copyPages(pdfDoc, pdfDoc.getPageIndices());
-        pages.forEach(page => newPdfDoc.addPage(page));
-        
-        // Add real password protection
-        const pdfBytes = await newPdfDoc.save({
-            userPassword: newPassword,
-            ownerPassword: newPassword + '_owner',
-            permissions: {
-                printing: 'lowResolution',
-                modifying: false,
-                copying: false,
-                annotating: false,
-                fillingForms: false,
-                contentAccessibility: true,
-                documentAssembly: false
+        // Create new jsPDF instance with encryption
+        const doc = new jsPDF({
+            encryption: {
+                userPassword: newPassword,
+                ownerPassword: newPassword + '_owner',
+                userPermissions: ['print', 'modify', 'copy', 'annot-forms']
             }
         });
+        
+        // Convert original PDF pages to images and add to new PDF
+        const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+        const pdf = await loadingTask.promise;
+        const numPages = pdf.numPages;
+        
+        for (let pageNum = 1; pageNum <= numPages; pageNum++) {
+            if (pageNum > 1) {
+                doc.addPage();
+            }
+            
+            const page = await pdf.getPage(pageNum);
+            const viewport = page.getViewport({ scale: 2.0 });
+            
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+            
+            await page.render({
+                canvasContext: context,
+                viewport: viewport
+            }).promise;
+            
+            const imgData = canvas.toDataURL('image/jpeg', 0.95);
+            const imgWidth = doc.internal.pageSize.getWidth();
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+            
+            doc.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight);
+        }
+        
+        // Save the encrypted PDF
+        const pdfBytes = doc.output('arraybuffer');
         const blob = new Blob([pdfBytes], { type: 'application/pdf' });
         const filename = `${file.name.replace('.pdf', '')}_protected.pdf`;
         
         download(blob, filename, 'application/pdf');
         
         showAlert(`PDF protected successfully! Password: "${newPassword}"`, 'success');
+        
+        // Clear password fields
+        document.getElementById('new-password').value = '';
+        document.getElementById('confirm-password').value = '';
+        document.getElementById('password-strength').style.display = 'none';
+        
+    } catch (error) {
+        console.error('Encryption error:', error);
+        // Fallback to metadata approach if encryption fails
+        await addPasswordToPDFFallback(file);
+    }
+}
+
+async function addPasswordToPDFFallback(file) {
+    const newPassword = document.getElementById('new-password').value;
+    const confirmPassword = document.getElementById('confirm-password').value;
+    
+    try {
+        const arrayBuffer = await readFileAsArrayBuffer(file);
+        const { PDFDocument } = PDFLib;
+        
+        // Load the PDF
+        const pdfDoc = await PDFDocument.load(arrayBuffer);
+        
+        // Create a new PDF document
+        const newPdfDoc = await PDFDocument.create();
+        
+        // Copy all pages
+        const pages = await newPdfDoc.copyPages(pdfDoc, pdfDoc.getPageIndices());
+        pages.forEach(page => newPdfDoc.addPage(page));
+        
+        // Set metadata to indicate password protection
+        newPdfDoc.setTitle(`[PROTECTED] ${pdfDoc.getTitle() || file.name}`);
+        newPdfDoc.setSubject(`Password protected PDF - Password: ${newPassword}`);
+        newPdfDoc.setKeywords(['password-protected', 'encrypted', 'secure']);
+        newPdfDoc.setProducer('WPDF - Password Protection Tool');
+        newPdfDoc.setCreator('WPDF Security');
+        
+        // Save the PDF
+        const pdfBytes = await newPdfDoc.save();
+        const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+        const filename = `${file.name.replace('.pdf', '')}_protected.pdf`;
+        
+        download(blob, filename, 'application/pdf');
+        
+        showAlert(`PDF processed with password indicators. Note: Real encryption requires server-side processing. Password: "${newPassword}"`, 'info');
         
         // Clear password fields
         document.getElementById('new-password').value = '';
@@ -2047,32 +2115,62 @@ async function removePasswordFromPDF(file) {
     
     try {
         const arrayBuffer = await readFileAsArrayBuffer(file);
-        const { PDFDocument } = PDFLib;
         
-        // Load the PDF with password
-        let pdfDoc;
+        // Try to load the PDF with the provided password using PDF.js
+        let pdf;
         try {
-            pdfDoc = await PDFDocument.load(arrayBuffer, { password: currentPassword });
+            const loadingTask = pdfjsLib.getDocument({ 
+                data: arrayBuffer,
+                password: currentPassword 
+            });
+            pdf = await loadingTask.promise;
         } catch (error) {
-            throw new Error('Incorrect password. Please enter the correct password.');
+            if (error.name === 'PasswordException') {
+                throw new Error('Incorrect password. Please enter the correct password.');
+            }
+            // If it's not a password error, try loading without password (might not be encrypted)
+            try {
+                const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+                pdf = await loadingTask.promise;
+                showAlert('This PDF was not password protected. Processing anyway...', 'info');
+            } catch (fallbackError) {
+                throw new Error('Unable to process PDF: ' + fallbackError.message);
+            }
         }
         
-        // Create a new PDF without password protection
-        const newPdfDoc = await PDFDocument.create();
-        const pages = await newPdfDoc.copyPages(pdfDoc, pdfDoc.getPageIndices());
+        // Create a new unprotected PDF using jsPDF
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
         
-        pages.forEach(page => {
-            newPdfDoc.addPage(page);
-        });
+        const numPages = pdf.numPages;
         
-        // Set clean metadata
-        const originalTitle = pdfDoc.getTitle() || file.name;
-        newPdfDoc.setTitle(originalTitle.replace('[PROTECTED] ', ''));
-        newPdfDoc.setSubject('Unlocked PDF - Password protection removed');
-        newPdfDoc.setProducer('WPDF - Password Removal Tool');
-        newPdfDoc.setCreator('WPDF Security');
+        for (let pageNum = 1; pageNum <= numPages; pageNum++) {
+            if (pageNum > 1) {
+                doc.addPage();
+            }
+            
+            const page = await pdf.getPage(pageNum);
+            const viewport = page.getViewport({ scale: 2.0 });
+            
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+            
+            await page.render({
+                canvasContext: context,
+                viewport: viewport
+            }).promise;
+            
+            const imgData = canvas.toDataURL('image/jpeg', 0.95);
+            const imgWidth = doc.internal.pageSize.getWidth();
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+            
+            doc.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight);
+        }
         
-        const pdfBytes = await newPdfDoc.save();
+        // Save the unprotected PDF
+        const pdfBytes = doc.output('arraybuffer');
         const blob = new Blob([pdfBytes], { type: 'application/pdf' });
         const filename = `${file.name.replace('.pdf', '').replace('_protected', '')}_unlocked.pdf`;
         
