@@ -1817,3 +1817,649 @@ select.form-control {
         gap: 0.5rem;
     }
 }
+/* Enhanced Watermark Preview Styles */
+#watermark-preview-overlay {
+    overflow: hidden !important;
+}
+
+.watermark-preview-text {
+    line-height: 1 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 10 !important;
+    transform-origin: center center !important;
+}
+
+.watermark-preview-image {
+    object-fit: contain !important;
+    z-index: 10 !important;
+    transform-origin: center center !important;
+}
+
+#watermark-preview-canvas-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent 49%, rgba(0,0,0,0.02) 50%, transparent 51%);
+    pointer-events: none;
+    z-index: 1;
+}
+
+@media (max-width: 768px) {
+    .watermark-preview-text {
+        font-size: 0.8em !important;
+    }
+}
+/* Perfect Watermark Options Styles */
+
+/* Watermark Type Selection */
+.watermark-type-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.watermark-type {
+    padding: 1.5rem;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: var(--surface);
+    position: relative;
+    overflow: hidden;
+}
+
+.watermark-type::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(139, 111, 71, 0.1), transparent);
+    transition: left 0.5s ease;
+}
+
+.watermark-type:hover::before {
+    left: 100%;
+}
+
+.watermark-type:hover {
+    border-color: var(--primary-color);
+    background: var(--background);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.watermark-type.active {
+    border-color: var(--primary-color);
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.watermark-type i {
+    font-size: 2rem;
+    margin-bottom: 0.75rem;
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+.watermark-type:hover i {
+    transform: scale(1.1);
+}
+
+.watermark-type.active i {
+    transform: scale(1.15);
+}
+
+/* Text Watermark Options */
+#text-watermark-options {
+    background: var(--background);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--border);
+}
+
+#watermark-text {
+    width: 100%;
+    padding: 1rem;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+    background: var(--surface);
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+}
+
+#watermark-text:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(139, 111, 71, 0.1);
+    background: white;
+}
+
+/* Settings Grid */
+.watermark-settings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.setting-group {
+    background: var(--surface);
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    transition: all 0.3s ease;
+}
+
+.setting-group:hover {
+    border-color: var(--primary-color);
+    box-shadow: var(--shadow-sm);
+}
+
+.setting-label {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.setting-label::before {
+    content: '';
+    width: 4px;
+    height: 16px;
+    background: var(--primary-color);
+    border-radius: 2px;
+}
+
+/* Enhanced Form Controls */
+.form-control {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    background: var(--background);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(139, 111, 71, 0.1);
+    background: var(--surface);
+}
+
+.form-control:hover {
+    border-color: var(--primary-light);
+}
+
+/* Color Input */
+input[type="color"] {
+    width: 100%;
+    height: 45px;
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+input[type="color"]:hover {
+    border-color: var(--primary-color);
+    transform: scale(1.02);
+}
+
+/* Enhanced Range Sliders */
+.form-range {
+    width: 100%;
+    height: 8px;
+    border-radius: 4px;
+    background: linear-gradient(to right, var(--border) 0%, var(--primary-color) 100%);
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+    cursor: pointer;
+    position: relative;
+}
+
+.form-range::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, transparent, rgba(139, 111, 71, 0.1));
+    border-radius: 6px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.form-range:hover::before {
+    opacity: 1;
+}
+
+.form-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+    cursor: pointer;
+    border: 3px solid white;
+    box-shadow: 0 2px 8px rgba(139, 111, 71, 0.3), 0 0 0 1px rgba(139, 111, 71, 0.1);
+    transition: all 0.2s ease;
+}
+
+.form-range::-webkit-slider-thumb:hover {
+    transform: scale(1.15);
+    box-shadow: 0 4px 12px rgba(139, 111, 71, 0.4), 0 0 0 2px rgba(139, 111, 71, 0.2);
+}
+
+.form-range::-webkit-slider-thumb:active {
+    transform: scale(1.25);
+}
+
+.form-range::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+    cursor: pointer;
+    border: 3px solid white;
+    box-shadow: 0 2px 8px rgba(139, 111, 71, 0.3);
+    transition: all 0.2s ease;
+}
+
+.form-range::-moz-range-thumb:hover {
+    transform: scale(1.15);
+}
+
+/* Position Grid */
+.position-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+    max-width: 240px;
+    margin: 0 auto;
+    padding: 1rem;
+    background: var(--background);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+}
+
+.position-option {
+    aspect-ratio: 1;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: var(--surface);
+    font-size: 0.8rem;
+    gap: 2px;
+    position: relative;
+    overflow: hidden;
+}
+
+.position-option::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: radial-gradient(circle, rgba(139, 111, 71, 0.2), transparent);
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    transform: translate(-50%, -50%);
+}
+
+.position-option:hover::before {
+    width: 100%;
+    height: 100%;
+}
+
+.position-option:hover {
+    border-color: var(--primary-color);
+    background: var(--background);
+    transform: scale(1.05);
+}
+
+.position-option.active {
+    border-color: var(--primary-color);
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+    color: white;
+    transform: scale(1.05);
+    box-shadow: var(--shadow-md);
+}
+
+.position-option i {
+    transition: transform 0.3s ease;
+}
+
+.position-option:hover i {
+    transform: scale(1.1);
+}
+
+/* Image Watermark Options */
+#image-watermark-options {
+    background: var(--background);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--border);
+}
+
+#watermark-image-upload {
+    min-height: 140px;
+    border: 2px dashed var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    transition: all 0.3s ease;
+}
+
+#watermark-image-upload:hover {
+    border-color: var(--primary-color);
+    background: var(--background);
+    transform: scale(1.01);
+}
+
+#watermark-image-upload.active {
+    border-color: var(--primary-color);
+    background: linear-gradient(135deg, rgba(139, 111, 71, 0.05), rgba(166, 138, 100, 0.05));
+    border-style: solid;
+}
+
+#image-preview-container {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: var(--surface);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+}
+
+.watermark-image-preview {
+    text-align: center;
+    padding: 1rem;
+}
+
+.watermark-image-preview img {
+    border-radius: 8px;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.3s ease;
+}
+
+.watermark-image-preview img:hover {
+    transform: scale(1.02);
+}
+
+/* Page Selection */
+#page-selection {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    padding: 0.75rem;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#page-selection:hover {
+    border-color: var(--primary-color);
+}
+
+#page-selection:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(139, 111, 71, 0.1);
+}
+
+#page-range-group {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: var(--background);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+}
+
+#page-range {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface);
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+}
+
+/* Preview Section Enhancements */
+#watermark-preview-section {
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 2rem;
+    margin: 2rem 0;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+}
+
+#watermark-preview-container {
+    background: linear-gradient(135deg, var(--background), var(--surface));
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    position: relative;
+}
+
+#watermark-preview-container::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    right: -1px;
+    bottom: -1px;
+    background: linear-gradient(45deg, var(--primary-color), var(--primary-light), var(--primary-color));
+    border-radius: 12px;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+#watermark-preview-container:hover::before {
+    opacity: 0.1;
+}
+
+#watermark-preview-canvas-container {
+    background: white;
+    border: 3px solid var(--border);
+    border-radius: 8px;
+    box-shadow: var(--shadow-lg);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+#watermark-preview-canvas-container:hover {
+    transform: scale(1.01);
+    box-shadow: 0 8px 25px rgba(139, 111, 71, 0.15);
+}
+
+.preview-controls {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: var(--background);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+}
+
+#update-preview-btn {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-sm);
+}
+
+#update-preview-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+#update-preview-btn:active {
+    transform: translateY(0);
+}
+
+.preview-note {
+    color: var(--text-secondary);
+    font-style: italic;
+    font-size: 0.85rem;
+    margin-left: 1rem;
+}
+
+/* Apply Button Enhancement */
+#apply-watermark-btn {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--shadow-md);
+    position: relative;
+    overflow: hidden;
+}
+
+#apply-watermark-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+#apply-watermark-btn:hover::before {
+    left: 100%;
+}
+
+#apply-watermark-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+}
+
+#apply-watermark-btn:active {
+    transform: translateY(-1px);
+}
+
+#apply-watermark-btn:disabled {
+    background: var(--border);
+    cursor: not-allowed;
+    transform: none;
+    opacity: 0.6;
+}
+
+/* Dark Theme Adjustments */
+[data-theme="dark"] .watermark-type {
+    background: var(--surface);
+    border-color: rgba(166, 138, 100, 0.3);
+}
+
+[data-theme="dark"] .watermark-type:hover {
+    border-color: var(--primary-color);
+    background: rgba(45, 37, 32, 0.8);
+}
+
+[data-theme="dark"] .watermark-type.active {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+}
+
+[data-theme="dark"] .setting-group {
+    background: rgba(45, 37, 32, 0.8);
+    border-color: rgba(166, 138, 100, 0.3);
+}
+
+[data-theme="dark"] .form-control {
+    background: rgba(45, 37, 32, 0.8);
+    border-color: rgba(166, 138, 100, 0.3);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .position-option {
+    background: rgba(45, 37, 32, 0.8);
+    border-color: rgba(166, 138, 100, 0.3);
+}
+
+[data-theme="dark"] #watermark-preview-canvas-container {
+    border-color: rgba(166, 138, 100, 0.4);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .watermark-type-options {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+    
+    .watermark-settings-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .position-grid {
+        max-width: 180px;
+    }
+    
+    #watermark-preview-container {
+        padding: 1rem;
+    }
+    
+    .preview-controls {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .watermark-type {
+        padding: 1rem;
+    }
+    
+    .watermark-type i {
+        font-size: 1.5rem;
+    }
+    
+    .setting-group {
+        padding: 0.75rem;
+    }
+    
+    .position-grid {
+        max-width: 150px;
+        gap: 0.25rem;
+    }
+}

@@ -2458,7 +2458,6 @@ function initializeWatermarking() {
 async function initializeWatermarkPreview(pdfFile) {
     const previewSection = document.getElementById('watermark-preview-section');
     const canvas = document.getElementById('watermark-preview-canvas');
-    const overlay = document.getElementById('watermark-preview-overlay');
     
     if (!previewSection || !canvas || !pdfFile) return;
     
@@ -2469,23 +2468,20 @@ async function initializeWatermarkPreview(pdfFile) {
         const pdf = await loadingTask.promise;
         const page = await pdf.getPage(1);
         
-        // Set canvas size
-        const viewport = page.getViewport({ scale: 0.8 });
+        // Set canvas size for better quality
+        const viewport = page.getViewport({ scale: 1.2 });
         canvas.width = viewport.width;
         canvas.height = viewport.height;
         
-        // Render PDF page
-        const context = canvas.getContext('2d');
-        await page.render({
-            canvasContext: context,
-            viewport: viewport
-        }).promise;
+        // Store original page data for re-rendering
+        canvas.originalPage = page;
+        canvas.originalViewport = viewport;
+        
+        // Initial render
+        await renderPreviewWithWatermark();
         
         // Show preview section
         previewSection.style.display = 'block';
-        
-        // Initial watermark preview
-        updateWatermarkPreview();
         
     } catch (error) {
         console.error('Error initializing preview:', error);
@@ -2493,111 +2489,188 @@ async function initializeWatermarkPreview(pdfFile) {
     }
 }
 
-// Update watermark preview
-function updateWatermarkPreview() {
+// Render preview with watermark directly on canvas
+async function renderPreviewWithWatermark() {
     const canvas = document.getElementById('watermark-preview-canvas');
-    const overlay = document.getElementById('watermark-preview-overlay');
+    if (!canvas || !canvas.originalPage) return;
     
-    if (!canvas || !overlay) return;
+    const context = canvas.getContext('2d');
+    const page = canvas.originalPage;
+    const viewport = canvas.originalViewport;
     
-    // Clear existing watermark elements
-    overlay.innerHTML = '';
+    // Clear canvas
+    context.clearRect(0, 0, canvas.width, canvas.height);
     
+    // Render PDF page
+    await page.render({
+        canvasContext: context,
+        viewport: viewport
+    }).promise;
+    
+    // Add watermark overlay
     const settings = getWatermarkSettings();
-    const canvasRect = canvas.getBoundingClientRect();
-    const canvasWidth = canvas.width;
-    const canvasHeight = canvas.height;
     
     if (settings.type === 'text' && settings.text.trim()) {
-        addTextWatermarkPreview(overlay, settings, canvasWidth, canvasHeight);
+        await renderTextWatermarkOnCanvas(context, settings, canvas.width, canvas.height);
     } else if (settings.type === 'image' && settings.imageFile) {
-        addImageWatermarkPreview(overlay, settings, canvasWidth, canvasHeight);
+        await renderImageWatermarkOnCanvas(context, settings, canvas.width, canvas.height);
     }
 }
 
-// Add text watermark to preview
-function addTextWatermarkPreview(overlay, settings, canvasWidth, canvasHeight) {
-    const textElement = document.createElement('div');
-    textElement.className = 'watermark-preview-text';
-    textElement.textContent = settings.text;
+// Render text watermark directly on canvas
+async function renderTextWatermarkOnCanvas(context, settings, canvasWidth, canvasHeight) {
+    // Save context state
+    context.save();
     
-    // Apply text styles
-    textElement.style.fontSize = settings.fontSize + 'px';
-    textElement.style.color = settings.textColor;
-    textElement.style.fontFamily = settings.fontFamily;
-    textElement.style.opacity = settings.opacity / 100;
-    textElement.style.transform = `rotate(${settings.rotation}deg)`;
+    // Set text properties
+    const fontSize = settings.fontSize * 1.2; // Scale for preview
+    let fontStyle = '';
     
     if (settings.fontStyle === 'bold') {
-        textElement.style.fontWeight = 'bold';
+        fontStyle = 'bold ';
     } else if (settings.fontStyle === 'italic') {
-        textElement.style.fontStyle = 'italic';
+        fontStyle = 'italic ';
     }
     
-    // Calculate position
-    const position = calculatePreviewPosition(settings.position, canvasWidth, canvasHeight, settings.fontSize * settings.text.length * 0.6, settings.fontSize);
-    textElement.style.left = position.x + 'px';
-    textElement.style.top = position.y + 'px';
+    context.font = `${fontStyle}${fontSize}px ${settings.fontFamily}`;
+    context.fillStyle = settings.textColor;
+    context.globalAlpha = settings.opacity / 100;
+    context.textAlign = 'center';
+    context.textBaseline = 'middle';
     
-    overlay.appendChild(textElement);
+    // Measure text
+    const textMetrics = context.measureText(settings.text);
+    const textWidth = textMetrics.width;
+    const textHeight = fontSize;
+    
+    // Calculate position
+    const position = calculateCanvasWatermarkPosition(settings.position, canvasWidth, canvasHeight, textWidth, textHeight);
+    
+    // Apply rotation
+    context.translate(position.x, position.y);
+    context.rotate((settings.rotation * Math.PI) / 180);
+    
+    // Add text shadow for better visibility
+    context.shadowColor = 'rgba(0, 0, 0, 0.3)';
+    context.shadowBlur = 2;
+    context.shadowOffsetX = 1;
+    context.shadowOffsetY = 1;
+    
+    // Draw text
+    context.fillText(settings.text, 0, 0);
+    
+    // Restore context state
+    context.restore();
 }
 
-// Add image watermark to preview
-function addImageWatermarkPreview(overlay, settings, canvasWidth, canvasHeight) {
-    const imageElement = document.createElement('img');
-    imageElement.className = 'watermark-preview-image';
-    
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        imageElement.src = e.target.result;
-        imageElement.onload = function() {
+// Render image watermark directly on canvas
+async function renderImageWatermarkOnCanvas(context, settings, canvasWidth, canvasHeight) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = function() {
+            // Save context state
+            context.save();
+            
             // Calculate scaled dimensions
             const scale = settings.imageScale / 100;
-            const imgWidth = this.naturalWidth * scale * 0.2; // Scale down for preview
-            const imgHeight = this.naturalHeight * scale * 0.2;
+            const maxSize = Math.min(canvasWidth, canvasHeight) * 0.4;
             
-            imageElement.style.width = imgWidth + 'px';
-            imageElement.style.height = imgHeight + 'px';
-            imageElement.style.opacity = settings.opacity / 100;
-            imageElement.style.transform = `rotate(${settings.rotation}deg)`;
+            let imgWidth = this.naturalWidth * scale * 0.8;
+            let imgHeight = this.naturalHeight * scale * 0.8;
+            
+            // Maintain aspect ratio and limit size
+            if (imgWidth > maxSize || imgHeight > maxSize) {
+                const aspectRatio = this.naturalWidth / this.naturalHeight;
+                if (imgWidth > imgHeight) {
+                    imgWidth = maxSize;
+                    imgHeight = maxSize / aspectRatio;
+                } else {
+                    imgHeight = maxSize;
+                    imgWidth = maxSize * aspectRatio;
+                }
+            }
             
             // Calculate position
-            const position = calculatePreviewPosition(settings.position, canvasWidth, canvasHeight, imgWidth, imgHeight);
-            imageElement.style.left = position.x + 'px';
-            imageElement.style.top = position.y + 'px';
+            const position = calculateCanvasWatermarkPosition(settings.position, canvasWidth, canvasHeight, imgWidth, imgHeight);
+            
+            // Set opacity
+            context.globalAlpha = settings.opacity / 100;
+            
+            // Apply rotation
+            context.translate(position.x + imgWidth/2, position.y + imgHeight/2);
+            context.rotate((settings.rotation * Math.PI) / 180);
+            
+            // Draw image
+            context.drawImage(this, -imgWidth/2, -imgHeight/2, imgWidth, imgHeight);
+            
+            // Restore context state
+            context.restore();
+            resolve();
         };
-    };
-    reader.readAsDataURL(settings.imageFile);
-    
-    overlay.appendChild(imageElement);
+        
+        // Load image from file
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(settings.imageFile);
+    });
 }
 
-// Calculate watermark position for preview
-function calculatePreviewPosition(position, canvasWidth, canvasHeight, itemWidth, itemHeight) {
-    const margin = 20; // Margin from edges for preview
+// Calculate watermark position for canvas rendering
+function calculateCanvasWatermarkPosition(position, canvasWidth, canvasHeight, itemWidth, itemHeight) {
+    const margin = Math.min(canvasWidth, canvasHeight) * 0.05;
+    
+    let x, y;
     
     switch (position) {
         case 'top-left':
-            return { x: margin, y: margin };
+            x = margin + itemWidth/2;
+            y = margin + itemHeight/2;
+            break;
         case 'top-center':
-            return { x: (canvasWidth - itemWidth) / 2, y: margin };
+            x = canvasWidth / 2;
+            y = margin + itemHeight/2;
+            break;
         case 'top-right':
-            return { x: canvasWidth - itemWidth - margin, y: margin };
+            x = canvasWidth - margin - itemWidth/2;
+            y = margin + itemHeight/2;
+            break;
         case 'center-left':
-            return { x: margin, y: (canvasHeight - itemHeight) / 2 };
+            x = margin + itemWidth/2;
+            y = canvasHeight / 2;
+            break;
         case 'center':
-            return { x: (canvasWidth - itemWidth) / 2, y: (canvasHeight - itemHeight) / 2 };
+            x = canvasWidth / 2;
+            y = canvasHeight / 2;
+            break;
         case 'center-right':
-            return { x: canvasWidth - itemWidth - margin, y: (canvasHeight - itemHeight) / 2 };
+            x = canvasWidth - margin - itemWidth/2;
+            y = canvasHeight / 2;
+            break;
         case 'bottom-left':
-            return { x: margin, y: canvasHeight - itemHeight - margin };
+            x = margin + itemWidth/2;
+            y = canvasHeight - margin - itemHeight/2;
+            break;
         case 'bottom-center':
-            return { x: (canvasWidth - itemWidth) / 2, y: canvasHeight - itemHeight - margin };
+            x = canvasWidth / 2;
+            y = canvasHeight - margin - itemHeight/2;
+            break;
         case 'bottom-right':
-            return { x: canvasWidth - itemWidth - margin, y: canvasHeight - itemHeight - margin };
+            x = canvasWidth - margin - itemWidth/2;
+            y = canvasHeight - margin - itemHeight/2;
+            break;
         default:
-            return { x: (canvasWidth - itemWidth) / 2, y: (canvasHeight - itemHeight) / 2 };
+            x = canvasWidth / 2;
+            y = canvasHeight / 2;
     }
+    
+    return { x, y };
+}
+
+// Update watermark preview (now renders on canvas)
+function updateWatermarkPreview() {
+    renderPreviewWithWatermark();
 }
 
 function getWatermarkSettings() {
