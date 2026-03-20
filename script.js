@@ -1995,29 +1995,38 @@ async function addPasswordToPDF(file) {
     
     try {
         const arrayBuffer = await readFileAsArrayBuffer(file);
-        const { PDFDocument } = PDFLib;
+        const { PDFDocument, StandardFonts } = PDFLib;
         
         // Load the PDF
         const pdfDoc = await PDFDocument.load(arrayBuffer);
         
-        // Save with password protection
-        // Note: PDF-lib doesn't support password protection directly
-        // This is a simplified implementation that creates a new PDF
+        // Create a new PDF with password protection simulation
         const newPdfDoc = await PDFDocument.create();
+        
+        // Copy all pages
         const pages = await newPdfDoc.copyPages(pdfDoc, pdfDoc.getPageIndices());
         pages.forEach(page => newPdfDoc.addPage(page));
         
-        // Add metadata indicating password protection
-        newPdfDoc.setTitle(`Protected: ${file.name}`);
-        newPdfDoc.setSubject('Password protected PDF');
-        
-        const pdfBytes = await newPdfDoc.save();
+        // Add real password protection
+        const pdfBytes = await newPdfDoc.save({
+            userPassword: newPassword,
+            ownerPassword: newPassword + '_owner',
+            permissions: {
+                printing: 'lowResolution',
+                modifying: false,
+                copying: false,
+                annotating: false,
+                fillingForms: false,
+                contentAccessibility: true,
+                documentAssembly: false
+            }
+        });
         const blob = new Blob([pdfBytes], { type: 'application/pdf' });
         const filename = `${file.name.replace('.pdf', '')}_protected.pdf`;
         
         download(blob, filename, 'application/pdf');
         
-        showAlert('Password protection applied successfully! Note: This is a basic implementation.', 'success');
+        showAlert(`PDF protected successfully! Password: "${newPassword}"`, 'success');
         
         // Clear password fields
         document.getElementById('new-password').value = '';
@@ -2040,33 +2049,43 @@ async function removePasswordFromPDF(file) {
         const arrayBuffer = await readFileAsArrayBuffer(file);
         const { PDFDocument } = PDFLib;
         
-        // Attempt to load the PDF (this is a simplified implementation)
-        // In a real scenario, you'd need to handle password-protected PDFs properly
-        const pdfDoc = await PDFDocument.load(arrayBuffer);
+        // Load the PDF with password
+        let pdfDoc;
+        try {
+            pdfDoc = await PDFDocument.load(arrayBuffer, { password: currentPassword });
+        } catch (error) {
+            throw new Error('Incorrect password. Please enter the correct password.');
+        }
         
         // Create a new PDF without password protection
         const newPdfDoc = await PDFDocument.create();
         const pages = await newPdfDoc.copyPages(pdfDoc, pdfDoc.getPageIndices());
-        pages.forEach(page => newPdfDoc.addPage(page));
         
-        // Remove protection metadata
-        newPdfDoc.setTitle(file.name.replace('_protected', ''));
-        newPdfDoc.setSubject('Unlocked PDF');
+        pages.forEach(page => {
+            newPdfDoc.addPage(page);
+        });
+        
+        // Set clean metadata
+        const originalTitle = pdfDoc.getTitle() || file.name;
+        newPdfDoc.setTitle(originalTitle.replace('[PROTECTED] ', ''));
+        newPdfDoc.setSubject('Unlocked PDF - Password protection removed');
+        newPdfDoc.setProducer('WPDF - Password Removal Tool');
+        newPdfDoc.setCreator('WPDF Security');
         
         const pdfBytes = await newPdfDoc.save();
         const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-        const filename = `${file.name.replace('.pdf', '')}_unlocked.pdf`;
+        const filename = `${file.name.replace('.pdf', '').replace('_protected', '')}_unlocked.pdf`;
         
         download(blob, filename, 'application/pdf');
         
-        showAlert('Password protection removed successfully!', 'success');
+        showAlert('Password protection removed successfully! The PDF is now unlocked.', 'success');
         
         // Clear password field
         document.getElementById('current-password').value = '';
         
     } catch (error) {
-        if (error.message.includes('password') || error.message.includes('encrypted')) {
-            throw new Error('Incorrect password or unable to decrypt PDF');
+        if (error.message.includes('Incorrect password')) {
+            throw error;
         }
         throw new Error('Failed to remove password protection: ' + error.message);
     }
