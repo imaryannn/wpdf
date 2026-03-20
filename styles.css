@@ -386,22 +386,41 @@ body {
 
 input[type="text"],
 input[type="number"],
+input[type="password"],
 select {
     width: 100%;
     padding: 0.75rem;
     border-radius: 8px;
-    border: 1px solid var(--border);
+    border: 2px solid var(--border);
     background: var(--surface);
     color: var(--text-primary);
     font-size: 15px;
-    transition: all 0.2s;
+    transition: all 0.3s ease;
+    font-family: inherit;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 input:focus,
 select:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(139, 111, 71, 0.1);
+    box-shadow: 0 0 0 3px rgba(139, 111, 71, 0.1), inset 0 1px 3px rgba(0, 0, 0, 0.05);
+    background: var(--background);
+}
+
+input:hover,
+select:hover {
+    border-color: var(--primary-light);
+}
+
+/* Enhanced password input styling */
+input[type="password"] {
+    letter-spacing: 0.1em;
+    font-family: 'Inter', monospace;
+}
+
+input[type="password"]:focus {
+    letter-spacing: normal;
 }
 
 .drop-zone {
@@ -1256,4 +1275,316 @@ select.form-control {
     .supported-formats {
         grid-template-columns: 1fr;
     }
+}
+/* PDF Security Styles */
+.security-mode-options {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 1.5rem;
+}
+
+.security-mode {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.security-mode:hover {
+    border-color: var(--primary-color);
+    background: var(--background);
+}
+
+.security-mode.active {
+    border-color: var(--primary-color);
+    background: linear-gradient(135deg, rgba(139, 111, 71, 0.1), rgba(166, 138, 100, 0.1));
+    color: var(--primary-color);
+}
+
+.password-input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-input-container input {
+    padding-right: 45px;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-secondary);
+    padding: 5px;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.password-toggle:hover {
+    color: var(--primary-color);
+    background: rgba(139, 111, 71, 0.1);
+}
+
+.password-strength {
+    margin-top: 0.5rem;
+}
+
+.strength-bar {
+    width: 100%;
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.strength-fill {
+    height: 100%;
+    transition: all 0.3s ease;
+    border-radius: 3px;
+}
+
+.strength-text {
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.strength-text span {
+    font-weight: 600;
+}
+
+.security-features {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.feature-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.5rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--background);
+    transition: all 0.3s ease;
+}
+
+.feature-item:hover {
+    border-color: var(--primary-color);
+    background: var(--surface);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.feature-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, rgba(139, 111, 71, 0.1), rgba(166, 138, 100, 0.1));
+    border-radius: 12px;
+    font-size: 24px;
+    color: var(--primary-color);
+    flex-shrink: 0;
+}
+
+.feature-content h4 {
+    color: var(--text-primary);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.feature-content p {
+    color: var(--text-secondary);
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* Dark theme styles for PDF Security */
+[data-theme="dark"] .security-mode {
+    border-color: rgba(166, 138, 100, 0.3);
+}
+
+[data-theme="dark"] .security-mode:hover {
+    border-color: #a68a64;
+    background: rgba(45, 37, 32, 0.5);
+}
+
+[data-theme="dark"] .security-mode.active {
+    border-color: #a68a64;
+    background: linear-gradient(135deg, rgba(166, 138, 100, 0.15), rgba(196, 165, 123, 0.15));
+    color: #c4a57b;
+}
+
+[data-theme="dark"] .password-toggle:hover {
+    color: #a68a64;
+    background: rgba(166, 138, 100, 0.15);
+}
+
+[data-theme="dark"] .strength-bar {
+    background: rgba(166, 138, 100, 0.2);
+}
+
+[data-theme="dark"] .feature-item {
+    background: rgba(45, 37, 32, 0.5);
+    border-color: rgba(166, 138, 100, 0.3);
+}
+
+[data-theme="dark"] .feature-item:hover {
+    border-color: #a68a64;
+    background: rgba(45, 37, 32, 0.8);
+}
+
+[data-theme="dark"] .feature-icon {
+    background: linear-gradient(135deg, rgba(166, 138, 100, 0.15), rgba(196, 165, 123, 0.15));
+}
+
+/* Responsive adjustments for PDF Security */
+@media (max-width: 768px) {
+    .security-features {
+        gap: 1rem;
+    }
+    
+    .feature-item {
+        padding: 1rem;
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .feature-icon {
+        align-self: center;
+    }
+}
+/* Enhanced Password Input Styling */
+.password-input-container {
+    margin-bottom: 1rem;
+}
+
+.password-input-container input {
+    padding-right: 50px !important;
+}
+
+.password-toggle {
+    right: 12px !important;
+    padding: 8px !important;
+    border-radius: 6px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 32px !important;
+    height: 32px !important;
+    z-index: 2 !important;
+}
+
+.password-toggle:hover {
+    transform: scale(1.05) !important;
+}
+
+.password-toggle:active {
+    transform: scale(0.95) !important;
+}
+
+.password-strength {
+    margin-top: 0.75rem !important;
+}
+
+.strength-bar {
+    height: 8px !important;
+    border-radius: 4px !important;
+    margin-bottom: 0.75rem !important;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+    border: 1px solid rgba(139, 111, 71, 0.1) !important;
+}
+
+.strength-fill {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    position: relative !important;
+}
+
+.strength-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, rgba(255,255,255,0.2) 0%, transparent 50%, rgba(255,255,255,0.1) 100%);
+    border-radius: 3px;
+}
+
+.strength-text {
+    font-size: 13px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+}
+
+.strength-text span {
+    transition: color 0.3s ease !important;
+}
+
+.strength-text::before {
+    content: '🔒';
+    font-size: 14px;
+}
+
+/* Dark theme password enhancements */
+[data-theme="dark"] .strength-bar {
+    border-color: rgba(166, 138, 100, 0.2) !important;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3) !important;
+}
+/* Fix Password Toggle Button Positioning */
+.password-toggle {
+    position: absolute !important;
+    right: 8px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    padding: 6px !important;
+    border-radius: 4px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 28px !important;
+    height: 28px !important;
+    z-index: 10 !important;
+    background: none !important;
+    border: none !important;
+    cursor: pointer !important;
+    color: var(--text-secondary) !important;
+}
+
+.password-toggle:hover {
+    transform: translateY(-50%) scale(1.05) !important;
+    color: var(--primary-color) !important;
+    background: rgba(139, 111, 71, 0.1) !important;
+}
+
+.password-toggle:active {
+    transform: translateY(-50%) scale(0.95) !important;
+}
+
+.password-toggle i {
+    font-size: 14px !important;
+    pointer-events: none !important;
+}
+
+.password-input-container {
+    position: relative !important;
+}
+
+.password-input-container input {
+    padding-right: 40px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
 }

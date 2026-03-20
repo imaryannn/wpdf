@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="modern-styles.css">
+    <link rel="stylesheet" href="password-fix.css">
 </head>
 <body>
     <nav class="navbar">
@@ -32,6 +33,7 @@
             <div class="navbar-feature">PDF Compressor</div>
             <div class="navbar-feature">Images to PDF</div>
             <div class="navbar-feature">PDF to Images</div>
+            <div class="navbar-feature">PDF Security</div>
             <div class="navbar-feature">Docs to PDF</div>
             <div class="theme-switch-wrapper">
                 <label class="theme-switch" for="theme-checkbox-mobile">
@@ -512,6 +514,349 @@
                             <i class="fas fa-redo"></i> Merge More Files
                         </button>
                     </p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- PDF SECURITY SECTION -->
+        <section id="pdf-security-section" style="display: none;">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-shield-alt"></i> PDF Password Protection
+                </div>
+                
+                <div class="form-group">
+                    <div class="security-mode-options">
+                        <div class="security-mode active" data-mode="add">Add Password</div>
+                        <div class="security-mode" data-mode="remove">Remove Password</div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <div id="security-drop-zone" class="drop-zone">
+                        <div class="drop-zone-icon">
+                            <i class="fas fa-file-pdf"></i>
+                        </div>
+                        <div class="drop-zone-prompt">
+                            Drag & drop a PDF file here or click to browse
+                        </div>
+                        <button type="button" id="security-browse-btn" class="btn btn-secondary" style="margin-top: 1rem;">
+                            <i class="fas fa-folder-open"></i> Browse Files
+                        </button>
+                    </div>
+                    <input type="file" id="security-file-input" accept=".pdf" class="drop-zone-input" style="position: absolute; left: -9999px; opacity: 0;">
+                </div>
+                
+                <div id="security-options" style="display: none;">
+                    <div id="add-password-options">
+                        <div class="form-group">
+                            <label class="form-label">New Password</label>
+                            <div class="password-input-container">
+                                <input type="password" id="new-password" class="form-control" placeholder="Enter password">
+                                <button type="button" class="password-toggle" data-target="new-password">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Confirm Password</label>
+                            <div class="password-input-container">
+                                <input type="password" id="confirm-password" class="form-control" placeholder="Confirm password">
+                                <button type="button" class="password-toggle" data-target="confirm-password">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="password-strength" id="password-strength" style="display: none;">
+                            <div class="strength-bar">
+                                <div class="strength-fill"></div>
+                            </div>
+                            <div class="strength-text">Password Strength: <span></span></div>
+                        </div>
+                    </div>
+                    
+                    <div id="remove-password-options" style="display: none;">
+                        <div class="form-group">
+                            <label class="form-label">Current Password</label>
+                            <div class="password-input-container">
+                                <input type="password" id="current-password" class="form-control" placeholder="Enter current password">
+                                <button type="button" class="password-toggle" data-target="current-password">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group" style="text-align: center;">
+                        <button id="apply-security-btn" class="btn btn-primary">
+                            <i class="fas fa-shield-alt"></i> <span id="security-btn-text">Add Password</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-info-circle"></i> Security Features
+                </div>
+                
+                <div class="security-features">
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <div class="feature-content">
+                            <h4>Password Protection</h4>
+                            <p>Secure your PDFs with strong password encryption</p>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="feature-content">
+                            <h4>Client-Side Processing</h4>
+                            <p>All encryption happens locally - passwords never leave your device</p>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-key"></i>
+                        </div>
+                        <div class="feature-content">
+                            <h4>Password Removal</h4>
+                            <p>Remove existing passwords from protected PDFs</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-info-circle"></i> How It Works
+                </div>
+                
+                <div class="how-it-works">
+                    <div class="steps">
+                        <div class="step">
+                            <div class="step-icon">
+                                <i class="fas fa-upload"></i>
+                            </div>
+                            <h3>1. Upload</h3>
+                            <p>Upload the PDF file you want to protect or unlock</p>
+                        </div>
+                        
+                        <div class="step">
+                            <div class="step-icon">
+                                <i class="fas fa-key"></i>
+                            </div>
+                            <h3>2. Set Password</h3>
+                            <p>Enter a strong password or current password to remove</p>
+                        </div>
+                        
+                        <div class="step">
+                            <div class="step-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <h3>3. Process</h3>
+                            <p>Apply or remove password protection</p>
+                        </div>
+                        
+                        <div class="step">
+                            <div class="step-icon">
+                                <i class="fas fa-download"></i>
+                            </div>
+                            <h3>4. Download</h3>
+                            <p>Download your secured or unlocked PDF</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- DOCS TO PDF SECTION -->
+        <section id="docs-to-pdf-section" style="display: none;">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-file-alt"></i> Convert Documents to PDF
+                </div>
+                
+                <div class="form-group">
+                    <div id="docs-drop-zone" class="drop-zone">
+                        <div class="drop-zone-icon">
+                            <i class="fas fa-file-upload"></i>
+                        </div>
+                        <div class="drop-zone-prompt">
+                            Drag & drop documents here or click to browse<br>
+                            <small>Supports: DOCX, PPTX, TXT, RTF, HTML</small>
+                        </div>
+                        <button type="button" id="docs-browse-btn" class="btn btn-secondary" style="margin-top: 1rem;">
+                            <i class="fas fa-folder-open"></i> Browse Files
+                        </button>
+                    </div>
+                    <input type="file" id="docs-file-input" multiple accept=".docx,.pptx,.txt,.rtf,.html,.htm" class="drop-zone-input" style="position: absolute; left: -9999px; opacity: 0;">
+                </div>
+                
+                <div id="docs-options" style="display: none;">
+                    <div id="docs-preview-container" style="display: none;">
+                        <div class="form-group">
+                            <label class="form-label">Document Preview & Settings</label>
+                            <div id="docs-preview-list" class="docs-preview-list">
+                                <!-- Documents will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">PDF Settings</label>
+                        <div class="pdf-settings-grid">
+                            <div class="setting-group">
+                                <label class="setting-label">Page Size</label>
+                                <select id="docs-page-size" class="form-control">
+                                    <option value="a4">A4 (210 × 297 mm)</option>
+                                    <option value="letter">Letter (8.5 × 11 in)</option>
+                                    <option value="legal">Legal (8.5 × 14 in)</option>
+                                    <option value="a3">A3 (297 × 420 mm)</option>
+                                </select>
+                            </div>
+                            
+                            <div class="setting-group">
+                                <label class="setting-label">Orientation</label>
+                                <div class="orientation-options">
+                                    <div class="orientation-option active" data-orientation="portrait">Portrait</div>
+                                    <div class="orientation-option" data-orientation="landscape">Landscape</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Conversion Options</label>
+                        <div class="conversion-options-grid">
+                            <div class="option-item">
+                                <input type="checkbox" id="preserve-formatting" checked>
+                                <label for="preserve-formatting">Preserve Original Formatting</label>
+                            </div>
+                            <div class="option-item">
+                                <input type="checkbox" id="include-headers-footers" checked>
+                                <label for="include-headers-footers">Include Headers & Footers</label>
+                            </div>
+                            <div class="option-item">
+                                <input type="checkbox" id="embed-fonts">
+                                <label for="embed-fonts">Embed Fonts</label>
+                            </div>
+                            <div class="option-item">
+                                <input type="checkbox" id="optimize-images">
+                                <label for="optimize-images">Optimize Images</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Margins (mm)</label>
+                        <div class="margins-grid">
+                            <div class="margin-input">
+                                <label>Top</label>
+                                <input type="number" id="margin-top" value="20" min="0" max="50">
+                            </div>
+                            <div class="margin-input">
+                                <label>Right</label>
+                                <input type="number" id="margin-right" value="20" min="0" max="50">
+                            </div>
+                            <div class="margin-input">
+                                <label>Bottom</label>
+                                <input type="number" id="margin-bottom" value="20" min="0" max="50">
+                            </div>
+                            <div class="margin-input">
+                                <label>Left</label>
+                                <input type="number" id="margin-left" value="20" min="0" max="50">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group" style="text-align: center;">
+                        <button id="convert-docs-btn" class="btn btn-primary">
+                            <i class="fas fa-file-pdf"></i> Convert to PDF
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-info-circle"></i> Supported Formats
+                </div>
+                
+                <div class="supported-formats">
+                    <div class="format-category">
+                        <h4><i class="fas fa-file-word"></i> Microsoft Office</h4>
+                        <ul>
+                            <li><strong>DOCX</strong> - Word Documents with full formatting support</li>
+                            <li><strong>PPTX</strong> - PowerPoint Presentations with slide layouts</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="format-category">
+                        <h4><i class="fas fa-file-alt"></i> Text Documents</h4>
+                        <ul>
+                            <li><strong>TXT</strong> - Plain text files with customizable formatting</li>
+                            <li><strong>RTF</strong> - Rich Text Format with styling preserved</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="format-category">
+                        <h4><i class="fas fa-code"></i> Web Documents</h4>
+                        <ul>
+                            <li><strong>HTML</strong> - Web pages with CSS styling support</li>
+                            <li><strong>HTM</strong> - HTML files with embedded content</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-info-circle"></i> How It Works
+                </div>
+                
+                <div class="how-it-works">
+                    <div class="steps">
+                        <div class="step">
+                            <div class="step-icon">
+                                <i class="fas fa-upload"></i>
+                            </div>
+                            <h3>1. Upload</h3>
+                            <p>Select your documents (DOCX, PPTX, TXT, etc.)</p>
+                        </div>
+                        
+                        <div class="step">
+                            <div class="step-icon">
+                                <i class="fas fa-cog"></i>
+                            </div>
+                            <h3>2. Configure</h3>
+                            <p>Set page size, orientation, margins, and options</p>
+                        </div>
+                        
+                        <div class="step">
+                            <div class="step-icon">
+                                <i class="fas fa-magic"></i>
+                            </div>
+                            <h3>3. Convert</h3>
+                            <p>Transform documents to high-quality PDFs</p>
+                        </div>
+                        
+                        <div class="step">
+                            <div class="step-icon">
+                                <i class="fas fa-download"></i>
+                            </div>
+                            <h3>4. Download</h3>
+                            <p>Get your converted PDF files instantly</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>

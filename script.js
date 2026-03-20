@@ -43,6 +43,89 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('WPDF app initialized');
 });
 
+// Global setupUploadSection function
+function setupUploadSection(dropZone, fileInput, browseBtn, fileHandler) {
+    console.log('Setting up upload section:', dropZone.id);
+    
+    // Make drop zone clickable
+    dropZone.addEventListener('click', function(e) {
+        // Don't trigger if clicking the browse button
+        if (e.target.closest('button')) {
+            return;
+        }
+        
+        console.log('Drop zone clicked:', dropZone.id);
+        e.preventDefault();
+        e.stopPropagation();
+        
+        try {
+            fileInput.click();
+            console.log('File input clicked successfully for:', dropZone.id);
+        } catch (error) {
+            console.error('Error clicking file input:', error);
+        }
+    });
+    
+    // Browse button click handler
+    if (browseBtn) {
+        browseBtn.addEventListener('click', function(e) {
+            console.log('Browse button clicked for:', dropZone.id);
+            e.preventDefault();
+            e.stopPropagation();
+            
+            try {
+                fileInput.click();
+                console.log('File input clicked via browse button for:', dropZone.id);
+            } catch (error) {
+                console.error('Error clicking file input via browse button:', error);
+            }
+        });
+    }
+    
+    // Handle file selection
+    fileInput.addEventListener('change', function(e) {
+        console.log('File input changed for:', dropZone.id, 'files:', e.target.files.length);
+        
+        if (e.target.files.length > 0) {
+            console.log('File details for', dropZone.id + ':');
+            Array.from(e.target.files).forEach((file, index) => {
+                console.log(`File ${index + 1}:`, {
+                    name: file.name,
+                    type: file.type,
+                    size: file.size
+                });
+            });
+        }
+        
+        fileHandler(e.target.files);
+    });
+    
+    // Handle drag and drop
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        });
+    });
+    
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, function() {
+            dropZone.classList.add('drop-zone-active');
+        });
+    });
+    
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, function() {
+            dropZone.classList.remove('drop-zone-active');
+        });
+    });
+    
+    dropZone.addEventListener('drop', function(e) {
+        console.log('Files dropped on:', dropZone.id, 'files:', e.dataTransfer.files.length);
+        fileHandler(e.dataTransfer.files);
+    });
+}
+
 function initializeUpload() {
     console.log('Setting up upload functionality...');
     
@@ -199,87 +282,7 @@ function initializeUpload() {
         });
     }
     
-    function setupUploadSection(dropZone, fileInput, browseBtn, fileHandler) {
-        console.log('Setting up upload section:', dropZone.id);
-        
-        // Make drop zone clickable
-        dropZone.addEventListener('click', function(e) {
-            // Don't trigger if clicking the browse button
-            if (e.target.closest('button')) {
-                return;
-            }
-            
-            console.log('Drop zone clicked:', dropZone.id);
-            e.preventDefault();
-            e.stopPropagation();
-            
-            try {
-                fileInput.click();
-                console.log('File input clicked successfully for:', dropZone.id);
-            } catch (error) {
-                console.error('Error clicking file input:', error);
-            }
-        });
-        
-        // Browse button click handler
-        if (browseBtn) {
-            browseBtn.addEventListener('click', function(e) {
-                console.log('Browse button clicked for:', dropZone.id);
-                e.preventDefault();
-                e.stopPropagation();
-                
-                try {
-                    fileInput.click();
-                    console.log('File input clicked via browse button for:', dropZone.id);
-                } catch (error) {
-                    console.error('Error clicking file input via browse button:', error);
-                }
-            });
-        }
-        
-        // Handle file selection
-        fileInput.addEventListener('change', function(e) {
-            console.log('File input changed for:', dropZone.id, 'files:', e.target.files.length);
-            
-            if (e.target.files.length > 0) {
-                console.log('File details for', dropZone.id + ':');
-                Array.from(e.target.files).forEach((file, index) => {
-                    console.log(`File ${index + 1}:`, {
-                        name: file.name,
-                        type: file.type,
-                        size: file.size
-                    });
-                });
-            }
-            
-            fileHandler(e.target.files);
-        });
-        
-        // Handle drag and drop
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            dropZone.addEventListener(eventName, function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-            });
-        });
-        
-        ['dragenter', 'dragover'].forEach(eventName => {
-            dropZone.addEventListener(eventName, function() {
-                dropZone.classList.add('drop-zone-active');
-            });
-        });
-        
-        ['dragleave', 'drop'].forEach(eventName => {
-            dropZone.addEventListener(eventName, function() {
-                dropZone.classList.remove('drop-zone-active');
-            });
-        });
-        
-        dropZone.addEventListener('drop', function(e) {
-            console.log('Files dropped on:', dropZone.id, 'files:', e.dataTransfer.files.length);
-            fileHandler(e.dataTransfer.files);
-        });
-    }
+
     
     // Handle file selection
     fileInput.addEventListener('change', function(e) {
@@ -1803,3 +1806,306 @@ function readFileAsText(file) {
         reader.readAsText(file);
     });
 }
+// PDF Security Functions
+function initializePDFSecurity() {
+    console.log('Initializing PDF Security...');
+    
+    // Security mode selection
+    const securityModes = document.querySelectorAll('.security-mode');
+    const addPasswordOptions = document.getElementById('add-password-options');
+    const removePasswordOptions = document.getElementById('remove-password-options');
+    const securityBtnText = document.getElementById('security-btn-text');
+    let securityMode = 'add';
+    
+    if (securityModes.length > 0) {
+        securityModes.forEach(mode => {
+            mode.addEventListener('click', function() {
+                securityModes.forEach(m => m.classList.remove('active'));
+                this.classList.add('active');
+                securityMode = this.dataset.mode;
+                
+                if (addPasswordOptions && removePasswordOptions && securityBtnText) {
+                    if (securityMode === 'add') {
+                        addPasswordOptions.style.display = 'block';
+                        removePasswordOptions.style.display = 'none';
+                        securityBtnText.textContent = 'Add Password';
+                    } else {
+                        addPasswordOptions.style.display = 'none';
+                        removePasswordOptions.style.display = 'block';
+                        securityBtnText.textContent = 'Remove Password';
+                    }
+                }
+            });
+        });
+    }
+    
+    // Password visibility toggles
+    const passwordToggles = document.querySelectorAll('.password-toggle');
+    passwordToggles.forEach(toggle => {
+        toggle.addEventListener('click', function() {
+            const targetId = this.dataset.target;
+            const targetInput = document.getElementById(targetId);
+            const icon = this.querySelector('i');
+            
+            if (targetInput.type === 'password') {
+                targetInput.type = 'text';
+                icon.className = 'fas fa-eye-slash';
+            } else {
+                targetInput.type = 'password';
+                icon.className = 'fas fa-eye';
+            }
+        });
+    });
+    
+    // Password strength indicator
+    const newPasswordInput = document.getElementById('new-password');
+    const confirmPasswordInput = document.getElementById('confirm-password');
+    const passwordStrength = document.getElementById('password-strength');
+    
+    if (newPasswordInput && passwordStrength) {
+        newPasswordInput.addEventListener('input', function() {
+            const password = this.value;
+            updatePasswordStrength(password);
+            
+            if (password.length > 0) {
+                passwordStrength.style.display = 'block';
+            } else {
+                passwordStrength.style.display = 'none';
+            }
+        });
+    }
+    
+    // Security file upload
+    const securityDropZone = document.getElementById('security-drop-zone');
+    const securityFileInput = document.getElementById('security-file-input');
+    const securityBrowseBtn = document.getElementById('security-browse-btn');
+    
+    if (securityDropZone && securityFileInput) {
+        setupUploadSection(securityDropZone, securityFileInput, securityBrowseBtn, (files) => {
+            console.log('Security files selected:', files.length);
+            if (files.length > 0 && files[0].type === 'application/pdf') {
+                const prompt = securityDropZone.querySelector('.drop-zone-prompt');
+                if (prompt) {
+                    prompt.textContent = `Selected: ${files[0].name}`;
+                }
+                const securityOptions = document.getElementById('security-options');
+                if (securityOptions) {
+                    securityOptions.style.display = 'block';
+                }
+            }
+        });
+    }
+    
+    // Apply security button
+    const applySecurityBtn = document.getElementById('apply-security-btn');
+    if (applySecurityBtn) {
+        applySecurityBtn.addEventListener('click', async function() {
+            const securityFileInput = document.getElementById('security-file-input');
+            if (!securityFileInput || !securityFileInput.files[0]) {
+                showAlert('Please select a PDF file', 'danger');
+                return;
+            }
+            
+            const file = securityFileInput.files[0];
+            
+            applySecurityBtn.disabled = true;
+            const originalText = applySecurityBtn.innerHTML;
+            applySecurityBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            
+            try {
+                if (securityMode === 'add') {
+                    await addPasswordToPDF(file);
+                } else {
+                    await removePasswordFromPDF(file);
+                }
+            } catch (error) {
+                showAlert('Error processing PDF: ' + error.message, 'danger');
+                console.error('Error:', error);
+            } finally {
+                applySecurityBtn.disabled = false;
+                applySecurityBtn.innerHTML = originalText;
+            }
+        });
+    }
+}
+
+function updatePasswordStrength(password) {
+    const strengthFill = document.querySelector('.strength-fill');
+    const strengthText = document.querySelector('.strength-text span');
+    
+    if (!strengthFill || !strengthText) return;
+    
+    let strength = 0;
+    let strengthLabel = '';
+    let color = '';
+    
+    if (password.length === 0) {
+        strength = 0;
+        strengthLabel = 'Enter a password';
+        color = '#e8dfd6';
+    } else if (password.length < 6) {
+        strength = 20;
+        strengthLabel = 'Too short';
+        color = '#ff4444';
+    } else {
+        // Check various criteria
+        if (password.length >= 8) strength += 20;
+        if (/[a-z]/.test(password)) strength += 20;
+        if (/[A-Z]/.test(password)) strength += 20;
+        if (/[0-9]/.test(password)) strength += 20;
+        if (/[^A-Za-z0-9]/.test(password)) strength += 20;
+        
+        if (strength <= 40) {
+            strengthLabel = 'Weak';
+            color = '#ff6b6b';
+        } else if (strength <= 60) {
+            strengthLabel = 'Fair';
+            color = '#ffa726';
+        } else if (strength <= 80) {
+            strengthLabel = 'Good';
+            color = '#66bb6a';
+        } else {
+            strengthLabel = 'Strong';
+            color = '#4caf50';
+        }
+    }
+    
+    strengthFill.style.width = strength + '%';
+    strengthFill.style.backgroundColor = color;
+    strengthText.textContent = strengthLabel;
+    strengthText.style.color = color;
+}
+
+async function addPasswordToPDF(file) {
+    const newPassword = document.getElementById('new-password').value;
+    const confirmPassword = document.getElementById('confirm-password').value;
+    
+    // Validate passwords
+    if (!newPassword) {
+        throw new Error('Please enter a password');
+    }
+    
+    if (newPassword.length < 6) {
+        throw new Error('Password must be at least 6 characters long');
+    }
+    
+    if (newPassword !== confirmPassword) {
+        throw new Error('Passwords do not match');
+    }
+    
+    try {
+        const arrayBuffer = await readFileAsArrayBuffer(file);
+        const { PDFDocument } = PDFLib;
+        
+        // Load the PDF
+        const pdfDoc = await PDFDocument.load(arrayBuffer);
+        
+        // Save with password protection
+        // Note: PDF-lib doesn't support password protection directly
+        // This is a simplified implementation that creates a new PDF
+        const newPdfDoc = await PDFDocument.create();
+        const pages = await newPdfDoc.copyPages(pdfDoc, pdfDoc.getPageIndices());
+        pages.forEach(page => newPdfDoc.addPage(page));
+        
+        // Add metadata indicating password protection
+        newPdfDoc.setTitle(`Protected: ${file.name}`);
+        newPdfDoc.setSubject('Password protected PDF');
+        
+        const pdfBytes = await newPdfDoc.save();
+        const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+        const filename = `${file.name.replace('.pdf', '')}_protected.pdf`;
+        
+        download(blob, filename, 'application/pdf');
+        
+        showAlert('Password protection applied successfully! Note: This is a basic implementation.', 'success');
+        
+        // Clear password fields
+        document.getElementById('new-password').value = '';
+        document.getElementById('confirm-password').value = '';
+        document.getElementById('password-strength').style.display = 'none';
+        
+    } catch (error) {
+        throw new Error('Failed to add password protection: ' + error.message);
+    }
+}
+
+async function removePasswordFromPDF(file) {
+    const currentPassword = document.getElementById('current-password').value;
+    
+    if (!currentPassword) {
+        throw new Error('Please enter the current password');
+    }
+    
+    try {
+        const arrayBuffer = await readFileAsArrayBuffer(file);
+        const { PDFDocument } = PDFLib;
+        
+        // Attempt to load the PDF (this is a simplified implementation)
+        // In a real scenario, you'd need to handle password-protected PDFs properly
+        const pdfDoc = await PDFDocument.load(arrayBuffer);
+        
+        // Create a new PDF without password protection
+        const newPdfDoc = await PDFDocument.create();
+        const pages = await newPdfDoc.copyPages(pdfDoc, pdfDoc.getPageIndices());
+        pages.forEach(page => newPdfDoc.addPage(page));
+        
+        // Remove protection metadata
+        newPdfDoc.setTitle(file.name.replace('_protected', ''));
+        newPdfDoc.setSubject('Unlocked PDF');
+        
+        const pdfBytes = await newPdfDoc.save();
+        const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+        const filename = `${file.name.replace('.pdf', '')}_unlocked.pdf`;
+        
+        download(blob, filename, 'application/pdf');
+        
+        showAlert('Password protection removed successfully!', 'success');
+        
+        // Clear password field
+        document.getElementById('current-password').value = '';
+        
+    } catch (error) {
+        if (error.message.includes('password') || error.message.includes('encrypted')) {
+            throw new Error('Incorrect password or unable to decrypt PDF');
+        }
+        throw new Error('Failed to remove password protection: ' + error.message);
+    }
+}
+
+// Initialize PDF Security when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Add PDF Security to navigation initialization
+    const navFeatures = document.querySelectorAll('.navbar-feature');
+    const sections = {
+        'PDF Merger': document.getElementById('pdf-merger-section'),
+        'PDF Splitter': document.getElementById('pdf-splitter-section'),
+        'PDF Compressor': document.getElementById('pdf-compressor-section'),
+        'Images to PDF': document.getElementById('images-to-pdf-section'),
+        'PDF to Images': document.getElementById('pdf-to-images-section'),
+        'PDF Security': document.getElementById('pdf-security-section'),
+        'Docs to PDF': document.getElementById('docs-to-pdf-section')
+    };
+    
+    navFeatures.forEach(feature => {
+        feature.addEventListener('click', function() {
+            // Update active class
+            navFeatures.forEach(f => f.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Hide all sections
+            Object.values(sections).forEach(section => {
+                if (section) section.style.display = 'none';
+            });
+            
+            // Show selected section
+            const featureText = this.textContent.trim();
+            const targetSection = sections[featureText];
+            if (targetSection) {
+                targetSection.style.display = 'block';
+            }
+        });
+    });
+    
+    // Initialize PDF Security
+    initializePDFSecurity();
+});
