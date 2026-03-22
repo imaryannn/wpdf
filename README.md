@@ -40,6 +40,29 @@ A modern, browser-based tool for working with PDF files. No server required - al
 - **Quality Control**: Adjustable image quality slider
 - **Batch Selection**: Select all or individual pages
 
+### 🔒 PDF Security
+- **Password Protection**: Add real password encryption to PDFs
+- **Password Removal**: Remove protection from existing PDFs
+- **Strength Indicator**: Visual password strength feedback
+- **Client-Side Processing**: Passwords never leave your device
+- **Real Encryption**: Uses jsPDF for actual password protection
+
+### 🎨 PDF Watermark
+- **Text Watermarks**: Add custom text with full styling control
+- **Image Watermarks**: Upload logos or images as watermarks
+- **Perfect Preview**: Real-time canvas preview showing exact results
+- **9-Point Positioning**: Precise watermark placement
+- **Advanced Controls**: Opacity, rotation, scaling, and font options
+- **Page Selection**: Apply to all pages, specific pages, or ranges
+- **Professional Quality**: High-resolution output with perfect accuracy
+
+### 📄 Docs to PDF
+- **Multi-Format Support**: DOCX, PPTX, TXT, RTF, HTML conversion
+- **Page Settings**: Customizable page size, orientation, and margins
+- **Conversion Options**: Preserve formatting, headers, footers
+- **Batch Processing**: Convert multiple documents at once
+- **Quality Control**: Optimized output with font embedding options
+
 ## 🎨 Design Features
 
 ### Modern UI/UX
@@ -47,6 +70,7 @@ A modern, browser-based tool for working with PDF files. No server required - al
 - **Glassmorphism Effects**: Modern translucent design elements
 - **Smooth Animations**: Floating effects and smooth transitions
 - **Responsive Design**: Works perfectly on desktop, tablet, and mobile
+- **Premium Styling**: Professional-grade visual design
 
 ### Dark/Light Theme
 - **Automatic Detection**: Respects your system theme preference
@@ -60,6 +84,12 @@ A modern, browser-based tool for working with PDF files. No server required - al
 - **Responsive Grid**: Adapts to any screen size
 - **Optimized Performance**: Fast loading on all devices
 
+### Enhanced Interactions
+- **Real-Time Previews**: See results before processing
+- **Drag & Drop**: Intuitive file and element arrangement
+- **Visual Feedback**: Loading states and progress indicators
+- **Smart Controls**: Context-aware options and settings
+
 ## 🔒 Privacy & Security
 
 - **100% Client-Side**: All processing happens in your browser
@@ -67,6 +97,7 @@ A modern, browser-based tool for working with PDF files. No server required - al
 - **No Data Collection**: We don't store or track any information
 - **Offline Capable**: Works without internet connection after initial load
 - **Open Source**: Full transparency with public code
+- **Real Encryption**: Actual password protection for PDFs
 
 ## 🛠️ Technical Stack
 
@@ -78,7 +109,8 @@ A modern, browser-based tool for working with PDF files. No server required - al
 
 ### PDF Processing Libraries
 - **PDF-lib**: Advanced PDF manipulation and creation
-- **PDF.js**: Mozilla's PDF rendering engine
+- **PDF.js**: Mozilla's PDF rendering engine for previews
+- **jsPDF**: PDF generation and encryption capabilities
 - **JSZip**: Client-side ZIP file creation
 - **Sortable.js**: Drag-and-drop functionality
 
@@ -94,7 +126,8 @@ A modern, browser-based tool for working with PDF files. No server required - al
 2. Choose your desired PDF tool from the navigation
 3. Upload your files using drag-and-drop or browse button
 4. Configure settings as needed
-5. Process and download your files
+5. Preview your changes (where available)
+6. Process and download your files
 
 ### Local Development
 ```bash
@@ -135,6 +168,7 @@ Contributions are welcome! Here's how you can help:
 - Ensure accessibility compliance
 - Maintain responsive design principles
 - Add comments for complex functionality
+- Test all PDF processing features thoroughly
 
 ## 📄 License
 
@@ -143,7 +177,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🙏 Acknowledgments
 
 - **PDF-lib**: For excellent PDF manipulation capabilities
-- **Mozilla PDF.js**: For reliable PDF rendering
+- **Mozilla PDF.js**: For reliable PDF rendering and previews
+- **jsPDF**: For PDF generation and encryption features
+- **JSZip**: For client-side file compression
+- **Sortable.js**: For drag-and-drop functionality
 - **Font Awesome**: For beautiful icons
 - **Google Fonts**: For typography (Inter, Bitcount Prop Double)
 - **Community**: For feedback and suggestions
@@ -156,7 +193,17 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🔄 Version History
 
-### v2.0.0 (Current)
+### v3.0.0 (Current)
+- ✅ Added comprehensive PDF Watermarking with real-time preview
+- ✅ Implemented PDF Security with real password encryption
+- ✅ Enhanced all existing features with better UI/UX
+- ✅ Added perfect preview system for watermarks
+- ✅ Improved mobile responsiveness across all features
+- ✅ Added professional styling and animations
+- ✅ Enhanced dark theme support
+- ✅ Optimized performance and user experience
+
+### v2.0.0
 - ✅ Complete UI/UX redesign with modern aesthetics
 - ✅ Added Images to PDF with drag-and-drop arrangement
 - ✅ PDF to Images with page selection
@@ -164,12 +211,33 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - ✅ Dark/Light theme with automatic detection
 - ✅ Mobile-responsive hamburger navigation
 - ✅ Improved error handling and user feedback
+- ✅ Added Docs to PDF conversion feature
 
 ### v1.0.0
 - ✅ Basic PDF Merger functionality
 - ✅ Simple PDF Splitter
 - ✅ PDF Compressor
 - ✅ Basic responsive design
+
+## 🌟 Key Features Highlights
+
+### Real-Time Previews
+- **Watermark Preview**: See exactly how watermarks will appear
+- **Page Selection**: Visual thumbnails for precise control
+- **Image Arrangement**: Drag-and-drop with live preview
+- **Quality Sliders**: Instant visual feedback
+
+### Professional Quality
+- **High-Resolution Output**: Crisp, clear results
+- **Accurate Positioning**: Pixel-perfect watermark placement
+- **Font Support**: Multiple font families and styles
+- **Color Control**: Full color picker integration
+
+### User Experience
+- **Intuitive Interface**: Easy-to-use controls
+- **Visual Feedback**: Clear progress indicators
+- **Error Handling**: Helpful error messages
+- **Accessibility**: Screen reader friendly
 
 ---
 
