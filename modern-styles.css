@@ -762,3 +762,110 @@ select:focus {
 [data-theme="dark"] .theme-switch-icon {
     filter: drop-shadow(0 2px 4px rgba(196, 165, 123, 0.3));
 }
+
+/* Dark theme fixes for elements missing overrides */
+[data-theme="dark"] .step {
+    background: rgba(45, 37, 32, 0.9) !important;
+    border-color: rgba(166, 138, 100, 0.2) !important;
+}
+
+[data-theme="dark"] .step h3 {
+    color: #f5f1ed !important;
+}
+
+[data-theme="dark"] .step p {
+    color: #bcaaa0 !important;
+}
+
+[data-theme="dark"] .form-label {
+    color: #f5f1ed !important;
+}
+
+[data-theme="dark"] .quality-label {
+    color: #bcaaa0 !important;
+}
+
+[data-theme="dark"] .strength-text {
+    color: #bcaaa0 !important;
+}
+
+[data-theme="dark"] .preview-note {
+    color: #bcaaa0 !important;
+}
+
+[data-theme="dark"] .option-item label {
+    color: #f5f1ed !important;
+}
+
+[data-theme="dark"] .format-category strong {
+    color: #c4a57b !important;
+}
+
+[data-theme="dark"] .format-category li {
+    color: #bcaaa0 !important;
+}
+
+[data-theme="dark"] .hero {
+    background: rgba(45, 37, 32, 0.96) !important;
+    border-color: rgba(166, 138, 100, 0.15) !important;
+    box-shadow: 0 18px 42px rgba(0, 0, 0, 0.3) !important;
+}
+
+[data-theme="dark"] .hero h1 {
+    color: #f5f1ed !important;
+}
+
+[data-theme="dark"] .hero p {
+    color: #bcaaa0 !important;
+}
+
+[data-theme="dark"] #watermark-preview-canvas-container {
+    background: #2d2520 !important;
+}
+
+[data-theme="dark"] .watermark-type {
+    color: #f5f1ed !important;
+}
+
+[data-theme="dark"] .watermark-type.active {
+    color: white !important;
+}
+
+[data-theme="dark"] .position-option {
+    color: #bcaaa0 !important;
+}
+
+[data-theme="dark"] .position-option.active {
+    color: white !important;
+}
+
+[data-theme="dark"] .setting-label {
+    color: #f5f1ed !important;
+}
+
+[data-theme="dark"] .docs-preview-list,
+[data-theme="dark"] .pdf-pages-grid,
+[data-theme="dark"] .image-preview-list {
+    background: rgba(45, 37, 32, 0.5) !important;
+}
+
+[data-theme="dark"] .selected-count {
+    color: #c4a57b !important;
+}
+
+[data-theme="dark"] .btn-secondary {
+    background: rgba(45, 37, 32, 0.9) !important;
+    color: #f5f1ed !important;
+    border-color: rgba(166, 138, 100, 0.3) !important;
+}
+
+[data-theme="dark"] .btn-secondary:hover {
+    background: rgba(45, 37, 32, 1) !important;
+    border-color: #a68a64 !important;
+}
+
+[data-theme="dark"] footer {
+    background: rgba(45, 37, 32, 0.95) !important;
+    border-top-color: rgba(166, 138, 100, 0.2) !important;
+    color: #bcaaa0 !important;
+}
